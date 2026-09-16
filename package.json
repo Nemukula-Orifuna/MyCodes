@@ -1,0 +1,21 @@
+{
+  "name": "pharma-blockchain-auth",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Blockchain-based authentication system for preventing counterfeit pharmaceuticals (dissertation research artefact)",
+  "engines": {
+    "node": "18.x"
+  },
+  "scripts": {
+    "compile": "truffle compile",
+    "migrate": "truffle migrate",
+    "test": "truffle test",
+    "ganache": "ganache --deterministic --port 8545"
+  },
+  "devDependencies": {
+    "ganache": "^7.9.2",
+    "solc": "^0.8.19",
+    "truffle": "^5.11.5"
+  },
+  "license": "UNLICENSED"
+}
