@@ -1,0 +1,13 @@
+node_modules/
+.ganache-db/
+gas-report.txt
+client/src/contracts/*.json
+client/dist/
+offchain-store/data/records.json
+caliper/contracts/pharmatrace.json
+caliper/report.html
+jmeter/calldata.csv
+jmeter/results.jtl
+jmeter/report/
+security/slither-report.json
+.env.local

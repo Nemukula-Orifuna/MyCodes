@@ -1,0 +1,26 @@
+# caliper/benchmarks/config.yaml
+test:
+  name: pharmatrace-ganache
+  description: Indicative throughput/latency on single-node Ganache (not production network capacity)
+  workers:
+    number: 1            # keep 1: transfer round reuses serials registered by worker 0 in round 0
+  rounds:
+    - label: registerProduct
+      txNumber: 500
+      rateControl: { type: fixed-rate, opts: { tps: 50 } }
+      workload:
+        module: workload/register.js
+        arguments: { gtin: "06009000000017", expiry: 1924991999,
+                     distributor: "0xFFcf8FDEE72ac11b5c542428B35EEF5769C409f0" }
+    - label: transferCustody
+      txNumber: 500      # must be <= registerProduct txNumber
+      rateControl: { type: fixed-rate, opts: { tps: 50 } }
+      workload:
+        module: workload/transfer.js
+        arguments: { gtin: "06009000000017", distributor: "0xFFcf8FDEE72ac11b5c542428B35EEF5769C409f0" }
+    - label: verifyProduct
+      txDuration: 30
+      rateControl: { type: fixed-rate, opts: { tps: 100 } }
+      workload:
+        module: workload/verify.js
+        arguments: { gtin: "06009000000017", registered: 500 }

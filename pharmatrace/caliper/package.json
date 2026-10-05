@@ -1,0 +1,11 @@
+{
+  "name": "pharmatrace-caliper",
+  "private": true,
+  "description": "Hyperledger Caliper 0.6.0 benchmarks (last release with the Ethereum connector)",
+  "scripts": {
+    "bind": "caliper bind --caliper-bind-sut ethereum:latest",
+    "contract": "node scripts/make-contract-json.js",
+    "bench": "caliper launch manager --caliper-workspace . --caliper-networkconfig networks/ganache.json --caliper-benchconfig benchmarks/config.yaml"
+  },
+  "dependencies": { "@hyperledger/caliper-cli": "0.6.0" }
+}

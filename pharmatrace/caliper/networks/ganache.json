@@ -1,0 +1,17 @@
+{
+  "caliper": { "blockchain": "ethereum" },
+  "ethereum": {
+    "url": "ws://127.0.0.1:8545",
+    "contractDeployerAddress": "0x90F8bf6A479f320ead074411a4B0e7944Ea8c9C1",
+    "contractDeployerAddressPrivateKey": "0x4f3edf983ac636a65a842ce7c78d9aa706d3b113bce9c46f30d7d21715b23b1d",
+    "fromAddress": "0x90F8bf6A479f320ead074411a4B0e7944Ea8c9C1",
+    "fromAddressPrivateKey": "0x4f3edf983ac636a65a842ce7c78d9aa706d3b113bce9c46f30d7d21715b23b1d",
+    "transactionConfirmationBlocks": 1,
+    "contracts": {
+      "pharmatrace": {
+        "path": "contracts/pharmatrace.json",
+        "gas": { "grantRole": 150000, "registerProduct": 400000, "transferCustody": 200000, "recordScan": 150000 }
+      }
+    }
+  }
+}

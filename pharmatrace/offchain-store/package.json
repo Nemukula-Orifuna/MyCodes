@@ -1,0 +1,8 @@
+{
+  "name": "offchain-store",
+  "private": true,
+  "main": "server.js",
+  "scripts": { "start": "node server.js", "start:tamper": "cross-env ALLOW_TAMPER=1 node server.js" },
+  "dependencies": { "express": "4.21.2", "cors": "2.8.5", "web3": "4.16.0" },
+  "devDependencies": { "cross-env": "7.0.3" }
+}
