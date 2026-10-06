@@ -8,7 +8,13 @@
   },
   "scripts": {
     "bind": "caliper bind --caliper-bind-sut ethereum:latest",
-    "test": "caliper launch manager --caliper-workspace . --caliper-networkconfig networks/ganache.json --caliper-benchconfig benchmarks.yaml --caliper-flow-only-test"
+    "configs": "node scripts/generateNetworkConfigs.js",
+    "register-participants": "node scripts/registerParticipants.js",
+    "run:registerBatch": "caliper launch manager --caliper-workspace . --caliper-networkconfig networks/ganache-manufacturer.json --caliper-benchconfig benchconfig/registerBatch.yaml --caliper-flow-skip-install --caliper-flow-skip-start --caliper-flow-skip-end --caliper-flow-skip-init",
+    "run:initiateTransfer": "node scripts/seed.js initiateTransfer 150 && caliper launch manager --caliper-workspace . --caliper-networkconfig networks/ganache-manufacturer.json --caliper-benchconfig benchconfig/initiateTransfer.yaml --caliper-flow-skip-install --caliper-flow-skip-start --caliper-flow-skip-end --caliper-flow-skip-init",
+    "run:acceptTransfer": "node scripts/seed.js acceptTransfer 150 && caliper launch manager --caliper-workspace . --caliper-networkconfig networks/ganache-distributor.json --caliper-benchconfig benchconfig/acceptTransfer.yaml --caliper-flow-skip-install --caliper-flow-skip-start --caliper-flow-skip-end --caliper-flow-skip-init",
+    "run:dispense": "node scripts/seed.js dispense 150 && caliper launch manager --caliper-workspace . --caliper-networkconfig networks/ganache-pharmacy.json --caliper-benchconfig benchconfig/dispense.yaml --caliper-flow-skip-install --caliper-flow-skip-start --caliper-flow-skip-end --caliper-flow-skip-init",
+    "run:verify": "caliper launch manager --caliper-workspace . --caliper-networkconfig networks/ganache-manufacturer.json --caliper-benchconfig benchconfig/verify.yaml --caliper-flow-skip-install --caliper-flow-skip-start --caliper-flow-skip-end --caliper-flow-skip-init"
   },
   "devDependencies": {
     "@hyperledger/caliper-cli": "0.6.0"
