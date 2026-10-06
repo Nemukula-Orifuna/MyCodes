@@ -5,8 +5,7 @@ build/
 client/node_modules/
 client/build/
 offchain/node_modules/
-offchain/*.sqlite
-offchain/*.db
+offchain/data/
 benchmarks/**/node_modules/
 benchmarks/**/report.html
 benchmarks/caliper/results/

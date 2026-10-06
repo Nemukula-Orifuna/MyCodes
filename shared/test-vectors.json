@@ -1,0 +1,83 @@
+[
+  {
+    "name": "simple flat object",
+    "input": {
+      "b": 2,
+      "a": 1
+    },
+    "canonicalJson": "{\"a\":1,\"b\":2}",
+    "hash": "0xb8ffb64722137f4b100665a52e3c943f8066e8ab8ba3b427e6f4b404defd82b0"
+  },
+  {
+    "name": "nested object with out-of-order keys",
+    "input": {
+      "zebra": {
+        "y": 2,
+        "x": 1
+      },
+      "apple": 1
+    },
+    "canonicalJson": "{\"apple\":1,\"zebra\":{\"x\":1,\"y\":2}}",
+    "hash": "0x49992fd7ae334e7b0ad4f024901e2f81c42bfd208a5cc8edf5e8d3233567c14b"
+  },
+  {
+    "name": "array preserves order (not sorted)",
+    "input": {
+      "list": [
+        3,
+        1,
+        2
+      ],
+      "name": "batch"
+    },
+    "canonicalJson": "{\"list\":[3,1,2],\"name\":\"batch\"}",
+    "hash": "0xc9d2b18649c500e7b4d2787ce2396c0daefd387d40ba5cd86e233cdd1f6b6e37"
+  },
+  {
+    "name": "empty object",
+    "input": {},
+    "canonicalJson": "{}",
+    "hash": "0xb48d38f93eaa084033fc5970bf96e559c33c4cdc07d889ab00b4d63f9590739d"
+  },
+  {
+    "name": "string with special characters",
+    "input": {
+      "note": "quote\" and newline\n and unicode café"
+    },
+    "canonicalJson": "{\"note\":\"quote\\\" and newline\\n and unicode café\"}",
+    "hash": "0x6a455379e0ce94414dcc9217b888d615a9c6d4b3c0ecad490996441300457fa3"
+  },
+  {
+    "name": "participant profile example",
+    "input": {
+      "organisationName": "Acme Pharma (Pty) Ltd",
+      "licenceNumber": "SAHPRA-MFR-00231",
+      "physicalAddress": "12 Voortrekker Rd, Cape Town"
+    },
+    "canonicalJson": "{\"licenceNumber\":\"SAHPRA-MFR-00231\",\"organisationName\":\"Acme Pharma (Pty) Ltd\",\"physicalAddress\":\"12 Voortrekker Rd, Cape Town\"}",
+    "hash": "0x87c2f8d366f0ce5e0e1c8ba66a63c37ae892ceb143e6af9e361041f485e04ede"
+  },
+  {
+    "name": "batch details example",
+    "input": {
+      "productName": "Amoxicillin 500mg",
+      "activeIngredient": "Amoxicillin",
+      "dosageForm": "capsule",
+      "quantityPerUnit": 30
+    },
+    "canonicalJson": "{\"activeIngredient\":\"Amoxicillin\",\"dosageForm\":\"capsule\",\"productName\":\"Amoxicillin 500mg\",\"quantityPerUnit\":30}",
+    "hash": "0xdc6e4e85c9a7d1926195fc0f7dadda4195df42577f2c1489938df7a665b6c0a0"
+  },
+  {
+    "name": "prescription details example (no patient data)",
+    "input": {
+      "itemsPrescribed": [
+        "Amoxicillin 500mg x30"
+      ],
+      "issuingPharmacistLicence": "SAHPRA-PHARM-00912",
+      "issuedAt": 1735689600
+    },
+    "canonicalJson": "{\"issuedAt\":1735689600,\"issuingPharmacistLicence\":\"SAHPRA-PHARM-00912\",\"itemsPrescribed\":[\"Amoxicillin 500mg x30\"]}",
+    "hash": "0xad6ca64c91992db6e6a844643170b66c2e8b203fa54f940a2bd4f75ce871a7a3"
+  }
+]

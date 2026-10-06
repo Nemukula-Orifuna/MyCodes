@@ -18,5 +18,8 @@
     "solc": "^0.8.19",
     "truffle": "^5.11.5"
   },
-  "license": "UNLICENSED"
+  "license": "UNLICENSED",
+  "dependencies": {
+    "js-sha3": "^0.9.3"
+  }
 }
