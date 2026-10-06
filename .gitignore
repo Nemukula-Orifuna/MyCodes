@@ -4,6 +4,8 @@ build/
 *.log
 client/node_modules/
 client/build/
+client/dist/
+client/src/contracts/
 offchain/node_modules/
 offchain/data/
 benchmarks/**/node_modules/

@@ -344,6 +344,8 @@ contract PharmaSupplyChain {
             bool exists,
             UnitStatus status,
             Role currentHolderRole,
+            bytes32 batchId,
+            bytes32 batchDataHash,
             uint64 batchExpiry,
             bool recalled,
             address manufacturer,
@@ -354,7 +356,9 @@ contract PharmaSupplyChain {
         exists = u.status != UnitStatus.None;
         status = u.status;
         currentHolderRole = participants[u.currentHolder].role;
+        batchId = u.batchId;
         Batch storage b = batches[u.batchId];
+        batchDataHash = b.dataHash;
         batchExpiry = b.expiryDate;
         recalled = b.recalled;
         manufacturer = b.manufacturer;

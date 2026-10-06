@@ -10,7 +10,7 @@
     "compile": "truffle compile",
     "migrate": "truffle migrate",
     "test": "truffle test",
-    "ganache": "ganache --deterministic --port 8545"
+    "ganache": "ganache --deterministic --port 8545 --chain.chainId 1337 --chain.networkId 1337"
   },
   "devDependencies": {
     "eth-gas-reporter": "^0.2.27",

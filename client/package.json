@@ -1,0 +1,34 @@
+{
+  "name": "pharma-client",
+  "version": "0.1.0",
+  "private": true,
+  "description": "React + Web3.js frontend for PharmaSupplyChain: role dashboards and the public verification page",
+  "engines": {
+    "node": "18.x"
+  },
+  "type": "module",
+  "scripts": {
+    "sync-contract": "node ./scripts/syncContractArtifact.mjs",
+    "dev": "npm run sync-contract && vite",
+    "build": "npm run sync-contract && vite build",
+    "preview": "vite preview",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "html5-qrcode": "^2.3.8",
+    "js-sha3": "^0.9.3",
+    "qrcode": "^1.5.3",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-router-dom": "^6.26.1",
+    "web3": "^1.10.0"
+  },
+  "devDependencies": {
+    "@testing-library/jest-dom": "^6.4.8",
+    "@testing-library/react": "^16.0.0",
+    "@vitejs/plugin-react": "^4.3.1",
+    "jsdom": "^24.1.1",
+    "vite": "^5.4.1",
+    "vitest": "^2.0.5"
+  }
+}

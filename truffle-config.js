@@ -3,7 +3,11 @@ module.exports = {
     development: {
       host: "127.0.0.1",
       port: 8545,
-      network_id: "*"
+      // Pinned (not "*") so the deployed address Truffle writes into
+      // build/contracts/*.json under networks["1337"] stays valid across
+      // Ganache restarts - the frontend reads that address directly. Start
+      // Ganache with `--chain.chainId 1337` to match (see package.json).
+      network_id: 1337
     }
   },
   mocha: {

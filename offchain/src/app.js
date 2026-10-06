@@ -14,6 +14,19 @@ function createApp(dbPath) {
   const app = express();
   app.use(express.json());
 
+  // This is a local development service (the frontend dev server and this
+  // API run on different localhost ports), not an internet-facing one, so
+  // reflecting the request origin is the standard dev-CORS pattern rather
+  // than a security concern - without it, a browser blocks every request
+  // from the Vite dev server's origin before it reaches any route below.
+  app.use((req, res, next) => {
+    res.setHeader("Access-Control-Allow-Origin", req.headers.origin || "*");
+    res.setHeader("Access-Control-Allow-Methods", "GET,POST,PUT,OPTIONS");
+    res.setHeader("Access-Control-Allow-Headers", "Content-Type");
+    if (req.method === "OPTIONS") return res.sendStatus(204);
+    next();
+  });
+
   app.get("/health", (req, res) => res.json({ status: "ok" }));
   app.use("/api/participants", participantsRouter(db));
   app.use("/api/batches", batchesRouter(db));
