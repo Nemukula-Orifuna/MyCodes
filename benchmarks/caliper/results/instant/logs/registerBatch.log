@@ -1,0 +1,90 @@
+2026.10.06-09:00:32.111[32m info [39m [caliper] [cli-launch-manager] 	Set workspace path: /home/user/MyCodes/benchmarks/caliper
+2026.10.06-09:00:32.112[32m info [39m [caliper] [cli-launch-manager] 	Set benchmark configuration path: /home/user/MyCodes/benchmarks/caliper/benchconfig/registerBatch.yaml
+2026.10.06-09:00:32.113[32m info [39m [caliper] [cli-launch-manager] 	Set network configuration path: /home/user/MyCodes/benchmarks/caliper/networks/ganache-manufacturer.json
+2026.10.06-09:00:32.113[32m info [39m [caliper] [cli-launch-manager] 	Set SUT type: ethereum
+2026.10.06-09:00:32.544[32m info [39m [caliper] [benchmark-validator] 	No observer specified, will default to `none`
+2026.10.06-09:00:32.544[32m info [39m [caliper] [caliper-engine] 	Starting benchmark flow
+2026.10.06-09:00:32.544[32m info [39m [caliper] [caliper-engine] 	Skipping start commands due to benchmark flow conditioning
+2026.10.06-09:00:32.545[32m info [39m [caliper] [caliper-engine] 	Skipping initialization phase due to benchmark flow conditioning
+2026.10.06-09:00:32.545[32m info [39m [caliper] [caliper-engine] 	Skipping install smart contract phase due to benchmark flow conditioning
+2026.10.06-09:00:32.566[32m info [39m [caliper] [monitor.js] 	No resource monitors specified
+2026.10.06-09:00:32.567[32m info [39m [caliper] [default-observer] 	Observer interval set to 5000 milliseconds
+2026.10.06-09:00:32.570[32m info [39m [caliper] [round-orchestrator] 	Preparing worker connections
+2026.10.06-09:00:32.570[32m info [39m [caliper] [worker-orchestrator] 	Launching worker 1 of 1
+2026.10.06-09:00:32.576[32m info [39m [caliper] [worker-orchestrator] 	Messenger not configured, entering configure phase...
+2026.10.06-09:00:32.576[32m info [39m [caliper] [worker-orchestrator] 	No existing workers detected, entering worker launch phase...
+2026.10.06-09:00:32.577[32m info [39m [caliper] [worker-orchestrator] 	Waiting for 1 workers to be connected...
+2026.10.06-09:00:32.969[32m info [39m [caliper] [cli-launch-worker] 	Set workspace path: /home/user/MyCodes/benchmarks/caliper
+2026.10.06-09:00:32.970[32m info [39m [caliper] [cli-launch-worker] 	Set benchmark configuration path: /home/user/MyCodes/benchmarks/caliper/benchconfig/registerBatch.yaml
+2026.10.06-09:00:32.970[32m info [39m [caliper] [cli-launch-worker] 	Set network configuration path: /home/user/MyCodes/benchmarks/caliper/networks/ganache-manufacturer.json
+2026.10.06-09:00:32.970[32m info [39m [caliper] [cli-launch-worker] 	Set SUT type: ethereum
+2026.10.06-09:00:33.399[32m info [39m [caliper] [worker-orchestrator] 	1 workers connected, progressing to worker assignment phase.
+2026.10.06-09:00:33.399[32m info [39m [caliper] [worker-orchestrator] 	Workers currently unassigned, awaiting index assignment...
+2026.10.06-09:00:33.399[32m info [39m [caliper] [worker-orchestrator] 	Waiting for 1 workers to be assigned...
+2026.10.06-09:00:33.454[32m info [39m [caliper] [worker-orchestrator] 	1 workers assigned, progressing to worker initialization phase.
+2026.10.06-09:00:33.454[32m info [39m [caliper] [worker-orchestrator] 	Waiting for 1 workers to be ready...
+2026.10.06-09:00:33.463[32m info [39m [caliper] [worker-message-handler] 	Initializing Worker#0...
+2026.10.06-09:00:33.475[32m info [39m [caliper] [worker-message-handler] 	Worker#0 initialized
+2026.10.06-09:00:33.476[32m info [39m [caliper] [worker-orchestrator] 	1 workers ready, progressing to test preparation phase.
+2026.10.06-09:00:33.476[32m info [39m [caliper] [round-orchestrator] 	Started round 1 (registerBatch-5tps)
+2026.10.06-09:00:33.480[32m info [39m [caliper] [worker-message-handler] 	Preparing Worker#0 for Round#0
+2026.10.06-09:00:33.504[32m info [39m [caliper] [caliper-worker] 	Info: worker 0 prepare test phase for round 0 is starting...
+2026.10.06-09:00:33.506[32m info [39m [caliper] [caliper-worker] 	Info: worker 0 prepare test phase for round 0 is completed
+2026.10.06-09:00:33.506[32m info [39m [caliper] [worker-message-handler] 	Worker#0 prepared for Round#0
+2026.10.06-09:00:33.507[32m info [39m [caliper] [worker-orchestrator] 	1 workers prepared, progressing to test phase.
+2026.10.06-09:00:33.508[32m info [39m [caliper] [round-orchestrator] 	Monitors successfully started
+2026.10.06-09:00:33.509[32m info [39m [caliper] [worker-message-handler] 	Worker#0 is starting Round#0
+2026.10.06-09:00:33.518[32m info [39m [caliper] [caliper-worker] 	Worker #0 starting workload loop
+2026.10.06-09:00:38.519[32m info [39m [caliper] [default-observer] 	[registerBatch-5tps Round 0 Transaction Info] - Submitted: 21 Succ: 20 Fail:0 Unfinished:1
+2026.10.06-09:00:42.622[32m info [39m [caliper] [worker-message-handler] 	Worker#0 finished Round#0
+2026.10.06-09:00:47.628[32m info [39m [caliper] [default-observer] 	Resetting txCount indicator count
+2026.10.06-09:00:47.629[32m info [39m [caliper] [report-builder] 	### Test result ###
+2026.10.06-09:00:47.633[32m info [39m [caliper] [report-builder] 	
++--------------------+------+------+-----------------+-----------------+-----------------+-----------------+------------------+
+| Name               | Succ | Fail | Send Rate (TPS) | Max Latency (s) | Min Latency (s) | Avg Latency (s) | Throughput (TPS) |
+|--------------------|------|------|-----------------|-----------------|-----------------|-----------------|------------------|
+| registerBatch-5tps | 41   | 0    | 5.1             | 0.07            | 0.04            | 0.05            | 5.1              |
++--------------------+------+------+-----------------+-----------------+-----------------+-----------------+------------------+
+
+2026.10.06-09:00:47.633[32m info [39m [caliper] [round-orchestrator] 	Finished round 1 (registerBatch-5tps) in 8.104 seconds
+2026.10.06-09:00:47.633[32m info [39m [caliper] [monitor.js] 	Stopping all monitors
+2026.10.06-09:00:47.633[32m info [39m [caliper] [round-orchestrator] 	Waiting 5 seconds for the next round...
+2026.10.06-09:00:52.637[32m info [39m [caliper] [round-orchestrator] 	Started round 2 (registerBatch-10tps)
+2026.10.06-09:00:52.640[32m info [39m [caliper] [worker-message-handler] 	Preparing Worker#0 for Round#1
+2026.10.06-09:00:52.646[32m info [39m [caliper] [caliper-worker] 	Info: worker 0 prepare test phase for round 1 is starting...
+2026.10.06-09:00:52.647[32m info [39m [caliper] [caliper-worker] 	Info: worker 0 prepare test phase for round 1 is completed
+2026.10.06-09:00:52.648[32m info [39m [caliper] [worker-message-handler] 	Worker#0 prepared for Round#1
+2026.10.06-09:00:52.648[32m info [39m [caliper] [worker-orchestrator] 	1 workers prepared, progressing to test phase.
+2026.10.06-09:00:52.648[32m info [39m [caliper] [round-orchestrator] 	Monitors successfully started
+2026.10.06-09:00:52.649[32m info [39m [caliper] [worker-message-handler] 	Worker#0 is starting Round#1
+2026.10.06-09:00:52.656[32m info [39m [caliper] [caliper-worker] 	Worker #0 starting workload loop
+2026.10.06-09:00:57.650[32m info [39m [caliper] [default-observer] 	[registerBatch-10tps Round 1 Transaction Info] - Submitted: 41 Succ: 40 Fail:0 Unfinished:1
+2026.10.06-09:01:01.759[32m info [39m [caliper] [worker-message-handler] 	Worker#0 finished Round#1
+2026.10.06-09:01:06.764[32m info [39m [caliper] [default-observer] 	Resetting txCount indicator count
+2026.10.06-09:01:06.765[32m info [39m [caliper] [report-builder] 	### Test result ###
+2026.10.06-09:01:06.766[32m info [39m [caliper] [report-builder] 	
++---------------------+------+------+-----------------+-----------------+-----------------+-----------------+------------------+
+| Name                | Succ | Fail | Send Rate (TPS) | Max Latency (s) | Min Latency (s) | Avg Latency (s) | Throughput (TPS) |
+|---------------------|------|------|-----------------|-----------------|-----------------|-----------------|------------------|
+| registerBatch-10tps | 81   | 0    | 10.1            | 0.07            | 0.03            | 0.04            | 10.1             |
++---------------------+------+------+-----------------+-----------------+-----------------+-----------------+------------------+
+
+2026.10.06-09:01:06.767[32m info [39m [caliper] [round-orchestrator] 	Finished round 2 (registerBatch-10tps) in 8.103 seconds
+2026.10.06-09:01:06.767[32m info [39m [caliper] [monitor.js] 	Stopping all monitors
+2026.10.06-09:01:06.767[32m info [39m [caliper] [report-builder] 	### All test results ###
+2026.10.06-09:01:06.768[32m info [39m [caliper] [report-builder] 	
++---------------------+------+------+-----------------+-----------------+-----------------+-----------------+------------------+
+| Name                | Succ | Fail | Send Rate (TPS) | Max Latency (s) | Min Latency (s) | Avg Latency (s) | Throughput (TPS) |
+|---------------------|------|------|-----------------|-----------------|-----------------|-----------------|------------------|
+| registerBatch-5tps  | 41   | 0    | 5.1             | 0.07            | 0.04            | 0.05            | 5.1              |
+|---------------------|------|------|-----------------|-----------------|-----------------|-----------------|------------------|
+| registerBatch-10tps | 81   | 0    | 10.1            | 0.07            | 0.03            | 0.04            | 10.1             |
++---------------------+------+------+-----------------+-----------------+-----------------+-----------------+------------------+
+
+2026.10.06-09:01:06.779[32m info [39m [caliper] [report-builder] 	Generated report with path /home/user/MyCodes/benchmarks/caliper/results/instant/registerBatch-report.html
+2026.10.06-09:01:06.779[32m info [39m [caliper] [monitor.js] 	Stopping all monitors
+2026.10.06-09:01:06.779[32m info [39m [caliper] [worker-orchestrator] 	Sending exit message to connected workers
+2026.10.06-09:01:06.779[32m info [39m [caliper] [round-orchestrator] 	Benchmark finished in 33.303 seconds. Total rounds: 2. Successful rounds: 2. Failed rounds: 0.
+2026.10.06-09:01:06.779[32m info [39m [caliper] [caliper-engine] 	Skipping end command due to benchmark flow conditioning
+2026.10.06-09:01:06.780[32m info [39m [caliper] [cli-launch-manager] 	Benchmark successfully finished!
+2026.10.06-09:01:06.780[32m info [39m [caliper] [worker-message-handler] 	Worker#0 is exiting

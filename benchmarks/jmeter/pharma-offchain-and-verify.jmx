@@ -1,0 +1,284 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jmeterTestPlan version="1.2" properties="5.0" jmeter="5.6.3">
+  <hashTree>
+    <TestPlan guiclass="TestPlanGui" testclass="TestPlan" testname="PharmaTrace off-chain + verify flow" enabled="true">
+      <stringProp name="TestPlan.comments">Benchmarks the off-chain Express API (Phase 3) and the public verify flow (an eth_call to PharmaSupplyChain.verify() plus the off-chain batch lookup used for the hash-integrity check), with concurrent users. Run with: jmeter -n -t pharma-offchain-and-verify.jmx -l results/raw-results.jtl -e -o results/html-report</stringProp>
+      <boolProp name="TestPlan.functional_mode">false</boolProp>
+      <boolProp name="TestPlan.serialize_threadgroups">false</boolProp>
+      <elementProp name="TestPlan.user_defined_variables" elementType="Arguments" guiclass="ArgumentsPanel" testclass="Arguments" testname="User Defined Variables" enabled="true">
+        <collectionProp name="Arguments.arguments">
+          <elementProp name="OFFCHAIN_HOST" elementType="Argument">
+            <stringProp name="Argument.name">OFFCHAIN_HOST</stringProp>
+            <stringProp name="Argument.value">127.0.0.1</stringProp>
+          </elementProp>
+          <elementProp name="OFFCHAIN_PORT" elementType="Argument">
+            <stringProp name="Argument.name">OFFCHAIN_PORT</stringProp>
+            <stringProp name="Argument.value">4000</stringProp>
+          </elementProp>
+          <elementProp name="RPC_HOST" elementType="Argument">
+            <stringProp name="Argument.name">RPC_HOST</stringProp>
+            <stringProp name="Argument.value">127.0.0.1</stringProp>
+          </elementProp>
+          <elementProp name="RPC_PORT" elementType="Argument">
+            <stringProp name="Argument.name">RPC_PORT</stringProp>
+            <stringProp name="Argument.value">8545</stringProp>
+          </elementProp>
+          <elementProp name="JMETER_UNIT_ID" elementType="Argument">
+            <stringProp name="Argument.name">JMETER_UNIT_ID</stringProp>
+            <stringProp name="Argument.value">0xdc20d0cbf85c50c805b1b19351fbad140b8a6c97dcceb83126a8384e16b34e86</stringProp>
+          </elementProp>
+          <elementProp name="JMETER_BATCH_ID" elementType="Argument">
+            <stringProp name="Argument.name">JMETER_BATCH_ID</stringProp>
+            <stringProp name="Argument.value">0x1332026a9ca0a6a66e8e073d130ed7093e048c9bbb6d988d3243ac257e266ee7</stringProp>
+          </elementProp>
+          <elementProp name="JMETER_VERIFY_CALLDATA" elementType="Argument">
+            <stringProp name="Argument.name">JMETER_VERIFY_CALLDATA</stringProp>
+            <stringProp name="Argument.value">0x75e36616dc20d0cbf85c50c805b1b19351fbad140b8a6c97dcceb83126a8384e16b34e86</stringProp>
+          </elementProp>
+          <elementProp name="CONTRACT_ADDRESS" elementType="Argument">
+            <stringProp name="Argument.name">CONTRACT_ADDRESS</stringProp>
+            <stringProp name="Argument.value">0xCfEB869F69431e42cdB54A4F4f105C19C080A601</stringProp>
+          </elementProp>
+        </collectionProp>
+      </elementProp>
+    </TestPlan>
+    <hashTree>
+
+      <!-- ============== Thread Group 1: Off-chain API ============== -->
+      <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="Off-chain API users" enabled="true">
+        <stringProp name="ThreadGroup.on_sample_error">continue</stringProp>
+        <elementProp name="ThreadGroup.main_controller" elementType="LoopController" guiclass="LoopControlPanel" testclass="LoopController" testname="Loop Controller" enabled="true">
+          <boolProp name="LoopController.continue_forever">false</boolProp>
+          <stringProp name="LoopController.loops">20</stringProp>
+        </elementProp>
+        <stringProp name="ThreadGroup.num_threads">20</stringProp>
+        <stringProp name="ThreadGroup.ramp_time">5</stringProp>
+        <boolProp name="ThreadGroup.scheduler">false</boolProp>
+      </ThreadGroup>
+      <hashTree>
+
+        <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="POST /api/participants" enabled="true">
+          <stringProp name="HTTPSampler.domain">${OFFCHAIN_HOST}</stringProp>
+          <stringProp name="HTTPSampler.port">${OFFCHAIN_PORT}</stringProp>
+          <stringProp name="HTTPSampler.protocol">http</stringProp>
+          <stringProp name="HTTPSampler.path">/api/participants</stringProp>
+          <stringProp name="HTTPSampler.method">POST</stringProp>
+          <boolProp name="HTTPSampler.postBodyRaw">true</boolProp>
+          <elementProp name="HTTPsampler.Arguments" elementType="Arguments">
+            <collectionProp name="Arguments.arguments">
+              <elementProp name="" elementType="HTTPArgument">
+                <boolProp name="HTTPArgument.always_encode">false</boolProp>
+                <stringProp name="Argument.value">{"address":"${address}","profile":{"organisationName":"JMeter Co","licenceNumber":"LIC-${address}"}}</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+              </elementProp>
+            </collectionProp>
+          </elementProp>
+        </HTTPSamplerProxy>
+        <hashTree>
+          <!-- Scoped to run once before THIS sampler only (not before every
+               sampler in the thread group), so address/batchId/prescriptionRef
+               stay fixed for the rest of this loop iteration's requests - a
+               PreProcessor placed as a thread-group-level sibling instead
+               re-generates fresh random values before every sampler, which is
+               exactly what caused the GET requests below to 404 on first run
+               (looking up an address/batchId the POST never actually used). -->
+          <JSR223PreProcessor guiclass="TestBeanGUI" testclass="JSR223PreProcessor" testname="Generate unique IDs" enabled="true">
+            <stringProp name="scriptLanguage">groovy</stringProp>
+            <stringProp name="script">def rnd = new Random()
+def hex = { int n -> def sb = new StringBuilder(); n.times { sb.append(Integer.toHexString(rnd.nextInt(16))) }; sb.toString() }
+vars.put("address", "0x" + hex(40))
+vars.put("batchId", "0x" + hex(64))
+vars.put("prescriptionRef", "RX-JMETER-" + ctx.getThreadNum() + "-" + vars.get("__jm__Loop Controller__idx") + "-" + System.nanoTime())
+</stringProp>
+          </JSR223PreProcessor>
+          <hashTree/>
+          <HeaderManager guiclass="HeaderPanel" testclass="HeaderManager" testname="Content-Type" enabled="true">
+            <collectionProp name="HeaderManager.headers">
+              <elementProp name="" elementType="Header">
+                <stringProp name="Header.name">Content-Type</stringProp>
+                <stringProp name="Header.value">application/json</stringProp>
+              </elementProp>
+            </collectionProp>
+          </HeaderManager>
+          <hashTree/>
+        </hashTree>
+
+        <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="GET /api/participants/:address" enabled="true">
+          <stringProp name="HTTPSampler.domain">${OFFCHAIN_HOST}</stringProp>
+          <stringProp name="HTTPSampler.port">${OFFCHAIN_PORT}</stringProp>
+          <stringProp name="HTTPSampler.protocol">http</stringProp>
+          <stringProp name="HTTPSampler.path">/api/participants/${address}</stringProp>
+          <stringProp name="HTTPSampler.method">GET</stringProp>
+        </HTTPSamplerProxy>
+        <hashTree/>
+
+        <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="POST /api/batches" enabled="true">
+          <stringProp name="HTTPSampler.domain">${OFFCHAIN_HOST}</stringProp>
+          <stringProp name="HTTPSampler.port">${OFFCHAIN_PORT}</stringProp>
+          <stringProp name="HTTPSampler.protocol">http</stringProp>
+          <stringProp name="HTTPSampler.path">/api/batches</stringProp>
+          <stringProp name="HTTPSampler.method">POST</stringProp>
+          <boolProp name="HTTPSampler.postBodyRaw">true</boolProp>
+          <elementProp name="HTTPsampler.Arguments" elementType="Arguments">
+            <collectionProp name="Arguments.arguments">
+              <elementProp name="" elementType="HTTPArgument">
+                <boolProp name="HTTPArgument.always_encode">false</boolProp>
+                <stringProp name="Argument.value">{"batchId":"${batchId}","details":{"productName":"JMeter Test Product","activeIngredient":"Testamol","dosageForm":"tablet"}}</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+              </elementProp>
+            </collectionProp>
+          </elementProp>
+        </HTTPSamplerProxy>
+        <hashTree>
+          <HeaderManager guiclass="HeaderPanel" testclass="HeaderManager" testname="Content-Type" enabled="true">
+            <collectionProp name="HeaderManager.headers">
+              <elementProp name="" elementType="Header">
+                <stringProp name="Header.name">Content-Type</stringProp>
+                <stringProp name="Header.value">application/json</stringProp>
+              </elementProp>
+            </collectionProp>
+          </HeaderManager>
+          <hashTree/>
+        </hashTree>
+
+        <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="GET /api/batches/:batchId" enabled="true">
+          <stringProp name="HTTPSampler.domain">${OFFCHAIN_HOST}</stringProp>
+          <stringProp name="HTTPSampler.port">${OFFCHAIN_PORT}</stringProp>
+          <stringProp name="HTTPSampler.protocol">http</stringProp>
+          <stringProp name="HTTPSampler.path">/api/batches/${batchId}</stringProp>
+          <stringProp name="HTTPSampler.method">GET</stringProp>
+        </HTTPSamplerProxy>
+        <hashTree/>
+
+        <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="POST /api/prescriptions" enabled="true">
+          <stringProp name="HTTPSampler.domain">${OFFCHAIN_HOST}</stringProp>
+          <stringProp name="HTTPSampler.port">${OFFCHAIN_PORT}</stringProp>
+          <stringProp name="HTTPSampler.protocol">http</stringProp>
+          <stringProp name="HTTPSampler.path">/api/prescriptions</stringProp>
+          <stringProp name="HTTPSampler.method">POST</stringProp>
+          <boolProp name="HTTPSampler.postBodyRaw">true</boolProp>
+          <elementProp name="HTTPsampler.Arguments" elementType="Arguments">
+            <collectionProp name="Arguments.arguments">
+              <elementProp name="" elementType="HTTPArgument">
+                <boolProp name="HTTPArgument.always_encode">false</boolProp>
+                <stringProp name="Argument.value">{"prescriptionRef":"${prescriptionRef}","details":{"itemsPrescribed":["Amoxicillin 500mg x30"],"issuedAt":1735689600}}</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+              </elementProp>
+            </collectionProp>
+          </elementProp>
+        </HTTPSamplerProxy>
+        <hashTree>
+          <HeaderManager guiclass="HeaderPanel" testclass="HeaderManager" testname="Content-Type" enabled="true">
+            <collectionProp name="HeaderManager.headers">
+              <elementProp name="" elementType="Header">
+                <stringProp name="Header.name">Content-Type</stringProp>
+                <stringProp name="Header.value">application/json</stringProp>
+              </elementProp>
+            </collectionProp>
+          </HeaderManager>
+          <hashTree/>
+        </hashTree>
+
+      </hashTree>
+
+      <!-- ============== Thread Group 2: Public verify flow ============== -->
+      <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="Verify-a-product users" enabled="true">
+        <stringProp name="ThreadGroup.on_sample_error">continue</stringProp>
+        <elementProp name="ThreadGroup.main_controller" elementType="LoopController" guiclass="LoopControlPanel" testclass="LoopController" testname="Loop Controller" enabled="true">
+          <boolProp name="LoopController.continue_forever">false</boolProp>
+          <stringProp name="LoopController.loops">20</stringProp>
+        </elementProp>
+        <stringProp name="ThreadGroup.num_threads">20</stringProp>
+        <stringProp name="ThreadGroup.ramp_time">5</stringProp>
+        <boolProp name="ThreadGroup.scheduler">false</boolProp>
+      </ThreadGroup>
+      <hashTree>
+
+        <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="POST /8545 eth_call verify(unitId)" enabled="true">
+          <stringProp name="HTTPSampler.domain">${RPC_HOST}</stringProp>
+          <stringProp name="HTTPSampler.port">${RPC_PORT}</stringProp>
+          <stringProp name="HTTPSampler.protocol">http</stringProp>
+          <stringProp name="HTTPSampler.path">/</stringProp>
+          <stringProp name="HTTPSampler.method">POST</stringProp>
+          <boolProp name="HTTPSampler.postBodyRaw">true</boolProp>
+          <elementProp name="HTTPsampler.Arguments" elementType="Arguments">
+            <collectionProp name="Arguments.arguments">
+              <elementProp name="" elementType="HTTPArgument">
+                <boolProp name="HTTPArgument.always_encode">false</boolProp>
+                <stringProp name="Argument.value">{"jsonrpc":"2.0","id":1,"method":"eth_call","params":[{"to":"${CONTRACT_ADDRESS}","data":"${JMETER_VERIFY_CALLDATA}"},"latest"]}</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+              </elementProp>
+            </collectionProp>
+          </elementProp>
+        </HTTPSamplerProxy>
+        <hashTree>
+          <HeaderManager guiclass="HeaderPanel" testclass="HeaderManager" testname="Content-Type" enabled="true">
+            <collectionProp name="HeaderManager.headers">
+              <elementProp name="" elementType="Header">
+                <stringProp name="Header.name">Content-Type</stringProp>
+                <stringProp name="Header.value">application/json</stringProp>
+              </elementProp>
+            </collectionProp>
+          </HeaderManager>
+          <hashTree/>
+          <ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="No JSON-RPC error" enabled="true">
+            <collectionProp name="Asserion.test_strings">
+              <stringProp name="49586">"result"</stringProp>
+            </collectionProp>
+            <stringProp name="Assertion.test_field">Assertion.response_data</stringProp>
+            <boolProp name="Assertion.assume_success">false</boolProp>
+            <intProp name="Assertion.test_type">16</intProp>
+          </ResponseAssertion>
+          <hashTree/>
+        </hashTree>
+
+        <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="GET /api/batches/:batchId (integrity check)" enabled="true">
+          <stringProp name="HTTPSampler.domain">${OFFCHAIN_HOST}</stringProp>
+          <stringProp name="HTTPSampler.port">${OFFCHAIN_PORT}</stringProp>
+          <stringProp name="HTTPSampler.protocol">http</stringProp>
+          <stringProp name="HTTPSampler.path">/api/batches/${JMETER_BATCH_ID}</stringProp>
+          <stringProp name="HTTPSampler.method">GET</stringProp>
+        </HTTPSamplerProxy>
+        <hashTree/>
+
+      </hashTree>
+
+      <!-- ============== Listeners: write raw results ============== -->
+      <ResultCollector guiclass="SimpleDataWriter" testclass="ResultCollector" testname="Raw results (jtl)" enabled="true">
+        <boolProp name="ResultCollector.error_logging">false</boolProp>
+        <objProp>
+          <name>saveConfig</name>
+          <value class="SampleSaveConfiguration">
+            <time>true</time>
+            <latency>true</latency>
+            <timestamp>true</timestamp>
+            <success>true</success>
+            <label>true</label>
+            <code>true</code>
+            <message>true</message>
+            <threadName>true</threadName>
+            <dataType>true</dataType>
+            <encoding>false</encoding>
+            <assertions>true</assertions>
+            <subresults>true</subresults>
+            <responseData>false</responseData>
+            <samplerData>false</samplerData>
+            <xml>false</xml>
+            <fieldNames>true</fieldNames>
+            <responseHeaders>false</responseHeaders>
+            <requestHeaders>false</requestHeaders>
+            <responseDataOnError>false</responseDataOnError>
+            <saveAssertionResultsFailureMessage>true</saveAssertionResultsFailureMessage>
+            <connectTime>true</connectTime>
+            <url>true</url>
+            <bytes>true</bytes>
+            <threadCounts>true</threadCounts>
+          </value>
+        </objProp>
+        <stringProp name="filename"></stringProp>
+      </ResultCollector>
+      <hashTree/>
+
+    </hashTree>
+  </hashTree>
+</jmeterTestPlan>

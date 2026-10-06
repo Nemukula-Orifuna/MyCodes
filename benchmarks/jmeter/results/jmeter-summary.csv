@@ -1,0 +1,8 @@
+thread_group,label,samples,failures,avg_ms,min_ms,max_ms
+Off-chain API users,POST /api/participants,400,0,6.0,0,57
+Off-chain API users,GET /api/participants/:address,400,0,4.6,0,36
+Off-chain API users,POST /api/batches,400,0,4.8,0,61
+Off-chain API users,GET /api/batches/:batchId,400,0,4.5,0,44
+Off-chain API users,POST /api/prescriptions,400,0,5.2,0,85
+Verify-a-product users,POST /8545 eth_call verify(unitId),400,0,59.7,15,129
+Verify-a-product users,GET /api/batches/:batchId (integrity check),400,0,4.8,0,75

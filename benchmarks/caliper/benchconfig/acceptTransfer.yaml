@@ -1,0 +1,24 @@
+test:
+  workers:
+    number: 1
+  rounds:
+    - label: acceptTransfer-5tps
+      txDuration: 8
+      rateControl:
+        type: fixed-rate
+        opts:
+          tps: 5
+      workload:
+        module: ./workloads/acceptTransfer.js
+        arguments:
+          offset: 0
+    - label: acceptTransfer-10tps
+      txDuration: 8
+      rateControl:
+        type: fixed-rate
+        opts:
+          tps: 10
+      workload:
+        module: ./workloads/acceptTransfer.js
+        arguments:
+          offset: 60

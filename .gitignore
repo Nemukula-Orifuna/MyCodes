@@ -2,6 +2,7 @@ node_modules/
 build/
 .env
 *.log
+!benchmarks/**/logs/*.log
 client/node_modules/
 client/build/
 client/dist/
@@ -9,5 +10,7 @@ client/src/contracts/
 offchain/node_modules/
 offchain/data/
 benchmarks/**/node_modules/
-benchmarks/**/report.html
-benchmarks/caliper/results/
+benchmarks/caliper/networks/*.json
+benchmarks/caliper/results/seed-*.json
+benchmarks/jmeter/results/html-report/
+benchmarks/jmeter/results/jmeter-console.log

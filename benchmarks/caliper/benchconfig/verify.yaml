@@ -1,0 +1,20 @@
+test:
+  workers:
+    number: 1
+  rounds:
+    - label: verify-5tps
+      txDuration: 8
+      rateControl:
+        type: fixed-rate
+        opts:
+          tps: 5
+      workload:
+        module: ./workloads/verify.js
+    - label: verify-10tps
+      txDuration: 8
+      rateControl:
+        type: fixed-rate
+        opts:
+          tps: 10
+      workload:
+        module: ./workloads/verify.js
