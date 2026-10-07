@@ -9,23 +9,45 @@
   --slate-50: #f8fafc;
   --white: #ffffff;
 
+  /* Deeper navy family for the sidebar/top-bar chrome - distinct from the
+     slate scale used in page content, so "chrome" and "content" read as
+     two different surfaces the way the reference design does. */
+  --navy-950: #070b16;
+  --navy-900: #0b1220;
+  --navy-800: #121b30;
+  --navy-700: #1b2745;
+
   --teal-700: #0f766e;
   --teal-600: #0d9488;
   --teal-500: #14b8a6;
   --teal-100: #ccfbf1;
   --teal-50: #f0fdfa;
 
+  /* Primary action color - the reference design uses blue for primary CTAs
+     (Register Participant, Connect wallet) while reserving teal for the
+     brandmark and the active-nav accent. */
+  --blue-700: #1d4ed8;
+  --blue-600: #2563eb;
+  --blue-500: #3b82f6;
+  --blue-100: #dbeafe;
+  --blue-50: #eff6ff;
+
+  --red-700: #b91c1c;
   --red-600: #dc2626;
   --red-100: #fee2e2;
   --amber-600: #d97706;
   --amber-100: #fef3c7;
   --green-700: #15803d;
+  --green-600: #16a34a;
   --green-100: #dcfce7;
 
   --radius: 10px;
+  --radius-lg: 14px;
   --sidebar-width: 248px;
+  --topbar-height: 64px;
   --shadow-sm: 0 1px 2px rgba(15, 23, 42, 0.06);
   --shadow-md: 0 4px 16px rgba(15, 23, 42, 0.08);
+  --shadow-lg: 0 12px 32px rgba(7, 11, 22, 0.16);
 }
 
 * {
@@ -64,11 +86,11 @@ button {
 .sidebar {
   width: var(--sidebar-width);
   flex-shrink: 0;
-  background: linear-gradient(180deg, var(--slate-900), #0b1220);
+  background: linear-gradient(180deg, var(--navy-900), var(--navy-950));
   color: var(--slate-200);
   display: flex;
   flex-direction: column;
-  padding: 24px 16px;
+  padding: 20px 14px;
   position: sticky;
   top: 0;
   height: 100vh;
@@ -78,9 +100,9 @@ button {
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 0 8px 24px;
+  padding: 4px 8px 22px;
   font-weight: 700;
-  font-size: 18px;
+  font-size: 17px;
   letter-spacing: -0.01em;
   color: var(--white);
 }
@@ -88,14 +110,13 @@ button {
 .sidebar-brand-mark {
   width: 28px;
   height: 28px;
+  flex-shrink: 0;
   border-radius: 8px;
-  background: var(--teal-500);
+  background: var(--navy-800);
   display: flex;
   align-items: center;
   justify-content: center;
-  color: var(--slate-900);
-  font-weight: 800;
-  font-size: 14px;
+  padding: 3px;
 }
 
 .sidebar-nav {
@@ -107,14 +128,19 @@ button {
 .sidebar-link {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 11px;
   padding: 10px 12px;
   border-radius: 8px;
   color: var(--slate-400);
   text-decoration: none;
-  font-size: 14px;
+  font-size: 13.5px;
   font-weight: 500;
   transition: background 0.12s ease, color 0.12s ease;
+}
+
+.sidebar-link svg {
+  flex-shrink: 0;
+  opacity: 0.85;
 }
 
 .sidebar-link:hover {
@@ -123,7 +149,13 @@ button {
 }
 
 .sidebar-link.active {
-  background: rgba(20, 184, 166, 0.15);
+  background: linear-gradient(90deg, rgba(37, 99, 235, 0.22), rgba(20, 184, 166, 0.12));
+  color: var(--white);
+  box-shadow: inset 2px 0 0 var(--blue-500);
+}
+
+.sidebar-link.active svg {
+  opacity: 1;
   color: var(--teal-500);
 }
 
@@ -138,8 +170,132 @@ button {
 
 .sidebar-footer {
   margin-top: auto;
-  padding-top: 16px;
+  padding-top: 14px;
   border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.sidebar-footer-note {
+  font-size: 11.5px;
+  color: var(--slate-600);
+  padding: 4px 10px 0;
+  line-height: 1.5;
+}
+
+/* --- Top bar --- */
+
+.topbar {
+  height: var(--topbar-height);
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 0 28px;
+  background: var(--white);
+  border-bottom: 1px solid var(--slate-200);
+  position: sticky;
+  top: 0;
+  z-index: 5;
+}
+
+.topbar-search {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+  max-width: 420px;
+  padding: 8px 14px;
+  border-radius: 999px;
+  background: var(--slate-100);
+  color: var(--slate-600);
+  font-size: 13.5px;
+}
+
+.topbar-search svg {
+  flex-shrink: 0;
+  color: var(--slate-400);
+}
+
+.topbar-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+.network-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 7px 12px;
+  border-radius: 999px;
+  background: var(--slate-100);
+  color: var(--slate-700);
+  font-size: 12.5px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.network-badge .dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 999px;
+  background: var(--green-600);
+  flex-shrink: 0;
+}
+
+.icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 999px;
+  border: 1px solid var(--slate-200);
+  background: var(--white);
+  color: var(--slate-600);
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.icon-btn:hover {
+  background: var(--slate-100);
+}
+
+.topbar-wallet {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 5px 12px 5px 5px;
+  border-radius: 999px;
+  border: 1px solid var(--slate-200);
+  background: var(--white);
+}
+
+.topbar-wallet-avatar {
+  width: 26px;
+  height: 26px;
+  border-radius: 999px;
+  background: linear-gradient(135deg, var(--blue-500), var(--teal-500));
+  flex-shrink: 0;
+}
+
+.topbar-wallet-text {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.25;
+}
+
+.topbar-wallet-role {
+  font-size: 11.5px;
+  font-weight: 700;
+  color: var(--slate-900);
+}
+
+.topbar-wallet-address {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 11px;
+  color: var(--slate-500);
 }
 
 .wallet-chip {
@@ -167,6 +323,11 @@ button {
 .main-content {
   flex: 1;
   min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.main-content-inner {
   padding: 28px 36px 60px;
 }
 
@@ -220,6 +381,70 @@ button {
   gap: 20px;
 }
 
+.stat-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.stat-card {
+  background: var(--white);
+  border: 1px solid var(--slate-200);
+  border-radius: var(--radius-lg);
+  padding: 18px;
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.stat-card-icon {
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--blue-50);
+  color: var(--blue-600);
+}
+
+.stat-card.tone-danger .stat-card-icon {
+  background: var(--red-100);
+  color: var(--red-600);
+}
+
+.stat-card.tone-success .stat-card-icon {
+  background: var(--green-100);
+  color: var(--green-700);
+}
+
+.stat-card.tone-teal .stat-card-icon {
+  background: var(--teal-50);
+  color: var(--teal-700);
+}
+
+.stat-card-value {
+  font-size: 26px;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  color: var(--slate-900);
+  line-height: 1.1;
+}
+
+.stat-card-label {
+  font-size: 13px;
+  color: var(--slate-600);
+  font-weight: 500;
+}
+
+@media (max-width: 1100px) {
+  .stat-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
 @media (max-width: 900px) {
   .grid-2 {
     grid-template-columns: 1fr;
@@ -231,6 +456,18 @@ button {
     width: 100%;
     height: auto;
     position: static;
+  }
+  .stat-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 560px) {
+  .stat-grid {
+    grid-template-columns: 1fr;
+  }
+  .topbar-search {
+    display: none;
   }
 }
 
@@ -294,12 +531,12 @@ button {
 }
 
 .btn-primary {
-  background: var(--teal-600);
+  background: var(--blue-600);
   color: var(--white);
 }
 
 .btn-primary:hover:not(:disabled) {
-  background: var(--teal-700);
+  background: var(--blue-700);
 }
 
 .btn-secondary {
@@ -426,6 +663,30 @@ table.data-table td {
   word-break: break-all;
 }
 
+.status-dot {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-weight: 600;
+  font-size: 13px;
+}
+
+.status-dot::before {
+  content: "";
+  width: 7px;
+  height: 7px;
+  border-radius: 999px;
+  background: currentColor;
+}
+
+.status-dot.status-active {
+  color: var(--green-600);
+}
+
+.status-dot.status-suspended {
+  color: var(--red-600);
+}
+
 .empty-state {
   color: var(--slate-600);
   font-size: 13.5px;
@@ -470,6 +731,208 @@ table.data-table td {
 .auth-card {
   max-width: 420px;
   text-align: center;
+}
+
+/* --- Landing / sign-in page --- */
+
+.landing {
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: 1.1fr 1fr;
+}
+
+.landing-hero {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 48px 56px;
+  color: var(--white);
+  background:
+    linear-gradient(160deg, rgba(7, 11, 22, 0.94), rgba(11, 18, 32, 0.8) 45%, rgba(29, 78, 216, 0.55)),
+    repeating-linear-gradient(135deg, rgba(255, 255, 255, 0.045) 0 2px, transparent 2px 26px),
+    linear-gradient(135deg, var(--navy-950), var(--navy-800) 55%, var(--teal-700));
+  overflow: hidden;
+}
+
+.landing-hero::after {
+  /* a soft vignette of drifting "capsule" shapes stands in for a product
+     photograph, so the hero reads as pharmaceutical without a stock asset */
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image:
+    radial-gradient(60px 24px at 18% 30%, rgba(255, 255, 255, 0.10) 50%, transparent 52%),
+    radial-gradient(60px 24px at 70% 20%, rgba(255, 255, 255, 0.08) 50%, transparent 52%),
+    radial-gradient(60px 24px at 40% 70%, rgba(255, 255, 255, 0.07) 50%, transparent 52%),
+    radial-gradient(60px 24px at 85% 65%, rgba(255, 255, 255, 0.09) 50%, transparent 52%),
+    radial-gradient(60px 24px at 10% 85%, rgba(255, 255, 255, 0.06) 50%, transparent 52%);
+  pointer-events: none;
+}
+
+.landing-hero-top,
+.landing-hero-bottom {
+  position: relative;
+  z-index: 1;
+}
+
+.landing-brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.landing-brand-mark {
+  width: 48px;
+  height: 48px;
+  border-radius: 13px;
+  background: rgba(255, 255, 255, 0.08);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 7px;
+  backdrop-filter: blur(2px);
+}
+
+.landing-brand-name {
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+}
+
+.landing-hero-copy {
+  margin-top: 56px;
+  max-width: 440px;
+}
+
+.landing-hero-copy h1 {
+  font-size: 34px;
+  line-height: 1.15;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  margin: 0 0 14px;
+}
+
+.landing-hero-copy p {
+  font-size: 15px;
+  line-height: 1.6;
+  color: rgba(226, 232, 240, 0.85);
+  margin: 0;
+}
+
+.landing-chain {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 34px;
+}
+
+.landing-chain-step {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 13px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  font-size: 12.5px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.landing-chain-arrow {
+  color: rgba(226, 232, 240, 0.5);
+  flex-shrink: 0;
+}
+
+.landing-partners {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  padding-top: 24px;
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.landing-partners-label {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: rgba(226, 232, 240, 0.55);
+}
+
+.landing-partner-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.07);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  font-size: 12px;
+  font-weight: 600;
+  color: rgba(241, 245, 249, 0.92);
+}
+
+.landing-panel {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 32px;
+  background: var(--slate-50);
+}
+
+.signin-card {
+  width: 100%;
+  max-width: 380px;
+  background: var(--white);
+  border: 1px solid var(--slate-200);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  padding: 32px 30px;
+}
+
+.signin-card-title {
+  font-size: 19px;
+  font-weight: 700;
+  margin: 0 0 4px;
+}
+
+.signin-card-subtitle {
+  font-size: 13.5px;
+  color: var(--slate-600);
+  margin: 0 0 22px;
+}
+
+.signin-divider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 18px 0;
+  color: var(--slate-400);
+  font-size: 12px;
+}
+
+.signin-divider::before,
+.signin-divider::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: var(--slate-200);
+}
+
+@media (max-width: 860px) {
+  .landing {
+    grid-template-columns: 1fr;
+  }
+  .landing-hero {
+    padding: 36px 28px;
+  }
+  .landing-hero-copy {
+    margin-top: 32px;
+  }
+  .landing-chain {
+    flex-wrap: wrap;
+  }
 }
 
 @media print {

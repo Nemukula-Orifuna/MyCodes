@@ -1,11 +1,14 @@
 import { useState } from "react";
 import { useWeb3 } from "../context/Web3Context";
 import { useTransferQueues } from "../hooks/useTransferQueues";
+import { useDispenseStats } from "../hooks/useDispenseStats";
 import { useTransaction } from "../hooks/useTransaction";
 import { PageHeader } from "../components/Layout";
 import { StatusBanner } from "../components/StatusBanner";
 import { IncomingCard } from "./TransferDashboard";
 import { Field } from "../components/Field";
+import { StatCard, StatGrid } from "../components/StatCard";
+import { TruckIcon, ShieldCheckIcon, AlertTriangleIcon } from "../components/Icon";
 import { offchainApi } from "../lib/offchainApi";
 import { hashRecord } from "../lib/canonicalHash";
 import { BYTES32_RE } from "../lib/ids";
@@ -13,15 +16,27 @@ import { BYTES32_RE } from "../lib/ids";
 export function PharmacyDashboard() {
   const { contract, account } = useWeb3();
   const { incoming, loading, error, refresh } = useTransferQueues(contract, account);
+  const { dispensedCount, suspiciousCount, refresh: refreshDispenseStats } = useDispenseStats(contract, account);
+
+  function handleDispensed() {
+    refresh();
+    refreshDispenseStats();
+  }
 
   return (
     <>
       <PageHeader title="Pharmacy" subtitle="Accept incoming stock and dispense to patients." />
       {error && <StatusBanner tone="error">{error}</StatusBanner>}
 
+      <StatGrid>
+        <StatCard icon={<TruckIcon />} value={incoming.length} label="Awaiting acceptance" tone="teal" />
+        <StatCard icon={<ShieldCheckIcon />} value={dispensedCount} label="Units dispensed" tone="success" />
+        <StatCard icon={<AlertTriangleIcon />} value={suspiciousCount} label="Suspicious activity flagged" tone="danger" />
+      </StatGrid>
+
       <div className="grid-2">
         <IncomingCard units={incoming} contract={contract} account={account} loading={loading} onDone={refresh} />
-        <DispenseCard contract={contract} account={account} onDispensed={refresh} />
+        <DispenseCard contract={contract} account={account} onDispensed={handleDispensed} />
       </div>
     </>
   );

@@ -1,10 +1,14 @@
 import { Sidebar } from "./Sidebar";
+import { TopBar } from "./TopBar";
 
 export function Layout({ children }) {
   return (
     <div className="app-shell">
       <Sidebar />
-      <main className="main-content">{children}</main>
+      <main className="main-content">
+        <TopBar />
+        <div className="main-content-inner">{children}</div>
+      </main>
     </div>
   );
 }

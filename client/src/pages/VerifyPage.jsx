@@ -12,6 +12,14 @@ import { offchainApi, tryFetch } from "../lib/offchainApi";
 import { hashRecord } from "../lib/canonicalHash";
 import { BYTES32_RE } from "../lib/ids";
 import { UNIT_STATUS_NAMES } from "../lib/constants";
+import { CheckCircleIcon, AlertTriangleIcon, ShieldCheckIcon } from "../components/Icon";
+
+const VERDICT_ICON = {
+  genuine: CheckCircleIcon,
+  warning: AlertTriangleIcon,
+  caution: AlertTriangleIcon,
+  neutral: ShieldCheckIcon,
+};
 
 export function VerifyPage() {
   const { unitId: unitIdParam } = useParams();
@@ -102,7 +110,13 @@ export function VerifyPage() {
 
       {result && verdictMeta && (
         <div className="card">
-          <div className={`verdict-badge verdict-${verdictMeta.tone}`}>{verdictMeta.label}</div>
+          <div className={`verdict-badge verdict-${verdictMeta.tone}`}>
+            {(() => {
+              const VerdictIcon = VERDICT_ICON[verdictMeta.tone];
+              return <VerdictIcon width={18} height={18} />;
+            })()}
+            {verdictMeta.label}
+          </div>
 
           {result.verify.exists && (
             <div style={{ marginTop: 20 }}>

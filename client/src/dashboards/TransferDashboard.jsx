@@ -6,6 +6,8 @@ import { PageHeader } from "../components/Layout";
 import { StatusBanner } from "../components/StatusBanner";
 import { HashTag, AddressTag } from "../components/AddressHashTags";
 import { Field } from "../components/Field";
+import { StatCard, StatGrid } from "../components/StatCard";
+import { TruckIcon, PackageIcon } from "../components/Icon";
 import { ADDRESS_RE } from "../lib/ids";
 import { UNIT_STATUS_NAMES } from "../lib/constants";
 
@@ -17,6 +19,11 @@ export function TransferDashboard({ title, subtitle, allowOutgoing }) {
     <>
       <PageHeader title={title} subtitle={subtitle} />
       {error && <StatusBanner tone="error">{error}</StatusBanner>}
+
+      <StatGrid>
+        <StatCard icon={<TruckIcon />} value={incoming.length} label="Awaiting acceptance" tone="teal" />
+        <StatCard icon={<PackageIcon />} value={holding.length} label="Units in custody" />
+      </StatGrid>
 
       <div className="grid-2">
         <IncomingCard units={incoming} contract={contract} account={account} loading={loading} onDone={refresh} />

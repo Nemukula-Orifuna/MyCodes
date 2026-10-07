@@ -1,11 +1,14 @@
 import { useState } from "react";
 import { useWeb3 } from "../context/Web3Context";
 import { useParticipantRegistry } from "../hooks/useParticipantRegistry";
+import { useChainStats } from "../hooks/useChainStats";
 import { useTransaction } from "../hooks/useTransaction";
 import { PageHeader } from "../components/Layout";
 import { StatusBanner } from "../components/StatusBanner";
 import { AddressTag, HashTag } from "../components/AddressHashTags";
 import { Field } from "../components/Field";
+import { StatCard, StatGrid } from "../components/StatCard";
+import { UsersIcon, PackageIcon, AlertTriangleIcon, ShieldCheckIcon } from "../components/Icon";
 import { ROLE, ROLE_NAMES } from "../lib/constants";
 import { ADDRESS_RE, referenceToBytes32 } from "../lib/ids";
 import { offchainApi } from "../lib/offchainApi";
@@ -16,14 +19,27 @@ const REGISTERABLE_ROLES = [ROLE.MANUFACTURER, ROLE.DISTRIBUTOR, ROLE.WHOLESALER
 export function RegulatorDashboard() {
   const { contract, account } = useWeb3();
   const { participants, loading, error, refresh } = useParticipantRegistry(contract);
+  const { batchCount, recalledCount, unitCount, refresh: refreshStats } = useChainStats(contract);
+
+  function refreshAll() {
+    refresh();
+    refreshStats();
+  }
 
   return (
     <>
       <PageHeader title="Regulator" subtitle="Register participants, suspend/reinstate licences, and recall batches." />
 
+      <StatGrid>
+        <StatCard icon={<UsersIcon />} value={participants.length} label="Registered participants" tone="teal" />
+        <StatCard icon={<PackageIcon />} value={batchCount} label="Batches registered" />
+        <StatCard icon={<ShieldCheckIcon />} value={unitCount} label="Units ever registered" tone="success" />
+        <StatCard icon={<AlertTriangleIcon />} value={recalledCount} label="Recalled batches" tone="danger" />
+      </StatGrid>
+
       <div className="grid-2">
-        <RegisterParticipantCard contract={contract} account={account} onRegistered={refresh} />
-        <RecallBatchCard contract={contract} account={account} />
+        <RegisterParticipantCard contract={contract} account={account} onRegistered={refreshAll} />
+        <RecallBatchCard contract={contract} account={account} onRecalled={refreshStats} />
       </div>
 
       <div className="card">
@@ -74,7 +90,11 @@ function ParticipantRow({ participant, contract, account, onChanged }) {
         <AddressTag address={participant.address} />
       </td>
       <td>{ROLE_NAMES[participant.role]}</td>
-      <td>{participant.active ? "Active" : "Suspended"}</td>
+      <td>
+        <span className={`status-dot ${participant.active ? "status-active" : "status-suspended"}`}>
+          {participant.active ? "Active" : "Suspended"}
+        </span>
+      </td>
       <td>
         <HashTag hash={participant.profileHash} />
       </td>
@@ -150,7 +170,7 @@ function RegisterParticipantCard({ contract, account, onRegistered }) {
   );
 }
 
-function RecallBatchCard({ contract, account }) {
+function RecallBatchCard({ contract, account, onRecalled }) {
   const [batchReference, setBatchReference] = useState("");
   const { run, status, error } = useTransaction();
   const [done, setDone] = useState(false);
@@ -159,7 +179,10 @@ function RecallBatchCard({ contract, account }) {
     e.preventDefault();
     const batchId = referenceToBytes32(batchReference);
     const result = await run(() => contract.methods.recallBatch(batchId).send({ from: account }));
-    if (result) setDone(true);
+    if (result) {
+      setDone(true);
+      onRecalled();
+    }
   }
 
   return (

@@ -1,11 +1,14 @@
 import { useState } from "react";
 import { useWeb3 } from "../context/Web3Context";
 import { useTransferQueues } from "../hooks/useTransferQueues";
+import { useChainStats } from "../hooks/useChainStats";
 import { useTransaction } from "../hooks/useTransaction";
 import { PageHeader } from "../components/Layout";
 import { StatusBanner } from "../components/StatusBanner";
 import { QrCode } from "../components/QrCode";
 import { Field } from "../components/Field";
+import { StatCard, StatGrid } from "../components/StatCard";
+import { PackageIcon, ShieldCheckIcon, TruckIcon } from "../components/Icon";
 import { OutgoingCard } from "./TransferDashboard";
 import { offchainApi } from "../lib/offchainApi";
 import { hashRecord } from "../lib/canonicalHash";
@@ -20,6 +23,7 @@ function toUnixSeconds(dateString) {
 export function ManufacturerDashboard() {
   const { contract, account } = useWeb3();
   const { holding, loading: holdingLoading, refresh: refreshHolding } = useTransferQueues(contract, account);
+  const { batchCount, unitCount, refresh: refreshStats } = useChainStats(contract, account);
   const [form, setForm] = useState({
     batchReference: "",
     productName: "",
@@ -62,12 +66,19 @@ export function ManufacturerDashboard() {
         units: serialNumbers.map((serial) => ({ serial, unitId: computeUnitId(batchId, serial) })),
       });
       refreshHolding();
+      refreshStats();
     }
   }
 
   return (
     <>
       <PageHeader title="Manufacturer" subtitle="Register a new batch and generate a QR code per serialised pack." />
+
+      <StatGrid>
+        <StatCard icon={<PackageIcon />} value={batchCount} label="Batches created" tone="teal" />
+        <StatCard icon={<ShieldCheckIcon />} value={unitCount} label="Units serialised" tone="success" />
+        <StatCard icon={<TruckIcon />} value={holding.length} label="Units currently held" />
+      </StatGrid>
 
       <div className="card">
         <div className="card-title">Register a batch</div>
