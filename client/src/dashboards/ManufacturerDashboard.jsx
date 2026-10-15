@@ -27,7 +27,6 @@ export function ManufacturerDashboard() {
   const [form, setForm] = useState({
     batchReference: "",
     productName: "",
-    activeIngredient: "",
     dosageForm: "",
     strength: "",
     manufactureDate: "",
@@ -51,7 +50,6 @@ export function ManufacturerDashboard() {
 
     const details = {
       productName: form.productName,
-      activeIngredient: form.activeIngredient,
       dosageForm: form.dosageForm,
       strength: form.strength,
     };
@@ -105,10 +103,6 @@ export function ManufacturerDashboard() {
               <label className="mock-field-row">
                 <span>Product Name</span>
                 <input value={form.productName} onChange={(e) => update("productName", e.target.value)} required />
-              </label>
-              <label className="mock-field-row">
-                <span>Active Ingredient</span>
-                <input value={form.activeIngredient} onChange={(e) => update("activeIngredient", e.target.value)} required />
               </label>
               <label className="mock-field-row">
                 <span>Dosage Form</span>
