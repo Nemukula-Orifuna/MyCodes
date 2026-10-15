@@ -1,4 +1,5 @@
 import { useState } from "react";
+import QRCode from "qrcode";
 import { useWeb3 } from "../context/Web3Context";
 import { useTransferQueues } from "../hooks/useTransferQueues";
 import { useChainStats } from "../hooks/useChainStats";
@@ -67,7 +68,14 @@ export function ManufacturerDashboard() {
       // row, so the verify page has one consistent place (per-unit
       // checkpoint rows) to read every stage's record from.
       await Promise.all(units.map((u) => offchainApi.createCheckpoint(u.unitId, batchId, "Manufacturer", account)));
-      setGeneratedUnits({ batchReference: form.batchReference, units });
+      setGeneratedUnits({
+        batchReference: form.batchReference,
+        productName: form.productName,
+        dosageForm: form.dosageForm,
+        manufactureDate: form.manufactureDate,
+        expiryDate: form.expiryDate,
+        units,
+      });
       refreshHolding();
       refreshStats();
     }
@@ -117,25 +125,94 @@ export function ManufacturerDashboard() {
       </div>
 
       {generatedUnits && (
-        <div className="card">
+        <div className="mock-card">
           <div className="card-title">
-            QR codes for {generatedUnits.batchReference}
+            Batch Registered
             <button className="btn btn-secondary no-print" onClick={() => window.print()}>
               Print
             </button>
           </div>
-          <div className="qr-grid">
-            {generatedUnits.units.map((u) => (
-              <div className="qr-tile" key={u.unitId}>
-                <QrCode value={u.unitId} size={130} />
-                <div className="serial">Serial #{u.serial}</div>
-              </div>
-            ))}
+          <div className="mock-banner mock-banner-genuine">
+            <p className="mock-banner-title">Batch registered successfully!</p>
+          </div>
+          <table className="kv-table">
+            <tbody>
+              <tr>
+                <td>Product Name</td>
+                <td>{generatedUnits.productName}</td>
+              </tr>
+              <tr>
+                <td>Dosage Form</td>
+                <td>{generatedUnits.dosageForm}</td>
+              </tr>
+              <tr>
+                <td>Batch Number</td>
+                <td>{generatedUnits.batchReference}</td>
+              </tr>
+              <tr>
+                <td>Manufacture Date</td>
+                <td>{generatedUnits.manufactureDate}</td>
+              </tr>
+              <tr>
+                <td>Expiry Date</td>
+                <td>{generatedUnits.expiryDate}</td>
+              </tr>
+              <tr>
+                <td>Quantity</td>
+                <td>{generatedUnits.units.length} units</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div className="mock-section-title">Generated QR Codes</div>
+          <div className="mock-table-wrap">
+            <table className="data-table">
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Serial Number</th>
+                  <th>QR Code</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody>
+                {generatedUnits.units.map((u, i) => (
+                  <tr key={u.unitId}>
+                    <td>{i + 1}</td>
+                    <td className="mono">
+                      {generatedUnits.batchReference}-{String(u.serial).padStart(4, "0")}
+                    </td>
+                    <td>
+                      <QrCode value={u.unitId} size={44} />
+                    </td>
+                    <td>
+                      <DownloadQrButton value={u.unitId} filename={`${generatedUnits.batchReference}-${u.serial}.png`} />
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
         </div>
       )}
 
       <OutgoingCard units={holding} contract={contract} account={account} loading={holdingLoading} onDone={refreshHolding} />
     </>
+  );
+}
+
+function DownloadQrButton({ value, filename }) {
+  async function handleDownload() {
+    const dataUrl = await QRCode.toDataURL(value, { width: 320, margin: 1 });
+    const link = document.createElement("a");
+    link.href = dataUrl;
+    link.download = filename;
+    link.click();
+  }
+
+  return (
+    <button type="button" className="btn btn-primary no-print" onClick={handleDownload}>
+      Download
+    </button>
   );
 }

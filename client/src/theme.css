@@ -41,6 +41,14 @@
   --green-600: #16a34a;
   --green-100: #dcfce7;
 
+  /* Standalone "scan result" shell (Verify page, QR/confirmation cards) -
+     a lighter, simpler visual language than the dashboard chrome above,
+     matching a plain blue-header product mockup rather than the app's own
+     dark sidebar, since this page is reached by anyone with a QR code,
+     not just a signed-in participant. */
+  --mock-blue: #3b5ea8;
+  --mock-blue-border: #bcd0ea;
+
   --radius: 10px;
   --radius-lg: 14px;
   --sidebar-width: 248px;
@@ -933,6 +941,185 @@ table.data-table td {
   .landing-chain {
     flex-wrap: wrap;
   }
+}
+
+/* --- Standalone mockup-style shell (Verify page) --- */
+
+.mock-shell {
+  min-height: 100vh;
+  background: var(--slate-50);
+}
+
+.mock-header {
+  height: 56px;
+  background: var(--mock-blue);
+  color: var(--white);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 24px;
+  position: sticky;
+  top: 0;
+  z-index: 5;
+}
+
+.mock-header-brand {
+  font-weight: 700;
+  font-size: 17px;
+  letter-spacing: -0.01em;
+}
+
+.mock-header-title {
+  font-size: 14px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.92);
+}
+
+.mock-body {
+  padding: 40px 24px 60px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.mock-card {
+  width: 100%;
+  max-width: 560px;
+  background: var(--white);
+  border: 1px solid var(--mock-blue-border);
+  border-radius: 10px;
+  padding: 28px;
+  box-shadow: var(--shadow-sm);
+}
+
+.mock-card + .mock-card {
+  margin-top: 22px;
+}
+
+.mock-card-title {
+  font-size: 18px;
+  font-weight: 700;
+  margin: 0 0 18px;
+  color: var(--slate-900);
+}
+
+.mock-scan-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  padding: 28px;
+  border-radius: 8px;
+  background: var(--slate-50);
+  border: 1px dashed var(--slate-200);
+}
+
+.mock-qr-placeholder {
+  width: 180px;
+  height: 180px;
+  border-radius: 6px;
+  background: var(--white);
+  border: 1px solid var(--slate-200);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--slate-400);
+}
+
+.mock-divider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 22px 0;
+  color: var(--slate-400);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.mock-divider::before,
+.mock-divider::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: var(--slate-200);
+}
+
+.mock-banner {
+  text-align: center;
+  padding: 18px 16px;
+  border-radius: 8px;
+  margin-bottom: 22px;
+}
+
+.mock-banner-genuine {
+  background: var(--green-100);
+}
+
+.mock-banner-genuine .mock-banner-title {
+  color: var(--green-700);
+}
+
+.mock-banner-alert {
+  background: var(--red-100);
+}
+
+.mock-banner-alert .mock-banner-title {
+  color: var(--red-700, #991b1b);
+}
+
+.mock-banner-neutral {
+  background: var(--slate-100);
+}
+
+.mock-banner-neutral .mock-banner-title {
+  color: var(--slate-700);
+}
+
+.mock-banner-title {
+  font-size: 20px;
+  font-weight: 800;
+  margin: 0 0 4px;
+  letter-spacing: 0.01em;
+}
+
+.mock-banner-subtitle {
+  font-size: 13.5px;
+  color: var(--slate-700);
+  margin: 0;
+}
+
+.mock-section-title {
+  font-size: 13.5px;
+  font-weight: 700;
+  margin: 24px 0 8px;
+  color: var(--slate-800);
+}
+
+table.kv-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+table.kv-table td {
+  padding: 8px 0;
+  border-bottom: 1px solid var(--slate-100);
+  vertical-align: top;
+}
+
+table.kv-table td:first-child {
+  color: var(--slate-600);
+  width: 44%;
+}
+
+table.kv-table td:last-child {
+  font-weight: 600;
+  text-align: right;
+  color: var(--slate-900);
+}
+
+.mock-table-wrap {
+  overflow-x: auto;
 }
 
 @media print {
