@@ -33,6 +33,39 @@ function openDb(dbPath) {
       prescription_hash TEXT NOT NULL,
       created_at INTEGER NOT NULL
     );
+
+    -- One row per unit per supply-chain stage it has passed through
+    -- (Manufacturer, Distributor, Wholesaler, Pharmacy, Dispensed). Each
+    -- row is its own copy of the batch record as held at that checkpoint,
+    -- independent of every other checkpoint's copy and of the canonical
+    -- "batches" row - so a direct edit to one checkpoint's copy (see the
+    -- tamper endpoint) cannot silently affect any other checkpoint, which
+    -- is what lets a mismatch be localised to a single stage.
+    CREATE TABLE IF NOT EXISTS batch_checkpoints (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      unit_id TEXT NOT NULL,
+      batch_id TEXT NOT NULL,
+      stage TEXT NOT NULL,
+      actor TEXT,
+      snapshot_json TEXT NOT NULL,
+      record_hash TEXT NOT NULL,
+      created_at INTEGER NOT NULL
+    );
+    CREATE INDEX IF NOT EXISTS idx_batch_checkpoints_unit ON batch_checkpoints(unit_id);
+
+    -- Records every direct edit made via the dev-only tamper endpoint, so a
+    -- tampering demo can also show who/what/when changed off the back of
+    -- the application (distinct from the blockchain's own custody log).
+    CREATE TABLE IF NOT EXISTS checkpoint_audit_log (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      checkpoint_id INTEGER NOT NULL,
+      unit_id TEXT NOT NULL,
+      stage TEXT NOT NULL,
+      field TEXT NOT NULL,
+      old_value TEXT,
+      new_value TEXT,
+      changed_at INTEGER NOT NULL
+    );
   `);
 
   return db;

@@ -14,6 +14,14 @@ import { BYTES32_RE } from "../lib/ids";
 import { UNIT_STATUS_NAMES } from "../lib/constants";
 import { CheckCircleIcon, AlertTriangleIcon, ShieldCheckIcon } from "../components/Icon";
 
+const ZERO_BYTES32 = "0x" + "0".repeat(64);
+
+// The supply-chain stages this project tracks, in order. Each one gets its
+// own off-chain record snapshot, hashed and anchored on-chain at the
+// moment that stage took custody (or dispensed) - see checkpoints.js on
+// the off-chain service and acceptTransfer/dispense in the contract.
+const STAGE_SEQUENCE = ["Manufacturer", "Distributor", "Wholesaler", "Pharmacy", "Dispensed"];
+
 const VERDICT_ICON = {
   genuine: CheckCircleIcon,
   warning: AlertTriangleIcon,
@@ -26,7 +34,7 @@ export function VerifyPage() {
   const navigate = useNavigate();
   const [input, setInput] = useState(unitIdParam || "");
   const [scanning, setScanning] = useState(false);
-  const [result, setResult] = useState(null); // { verify, history, integrity } | null
+  const [result, setResult] = useState(null); // { verify, history, supplyChain } | null
   const [loading, setLoading] = useState(false);
   const [loadError, setLoadError] = useState(null);
 
@@ -56,8 +64,8 @@ export function VerifyPage() {
     try {
       const verify = await client.contract.methods.verify(unitId).call();
       const history = verify.exists ? await client.contract.methods.getHistory(unitId).call() : [];
-      const integrity = verify.exists ? await checkOffchainIntegrity(verify) : null;
-      setResult({ unitId, verify, history, integrity });
+      const supplyChain = verify.exists ? await checkSupplyChainIntegrity(unitId, history) : null;
+      setResult({ unitId, verify, history, supplyChain });
     } catch (err) {
       setLoadError(err.message || "Lookup failed.");
     } finally {
@@ -81,8 +89,16 @@ export function VerifyPage() {
     navigate(`/verify/${decodedText.trim()}`);
   }
 
-  const verdict = result ? computeVerdict(result.verify) : null;
-  const verdictMeta = verdict ? VERDICT_META[verdict] : null;
+  const baseVerdict = result ? computeVerdict(result.verify) : null;
+  const tampered = result && result.supplyChain && result.supplyChain.status === "tampered";
+  // A checkpoint hash mismatch is the strongest possible signal - the
+  // off-chain record itself no longer matches what was anchored on-chain -
+  // so it overrides whatever the custody-status verdict alone would say.
+  const verdictMeta = tampered
+    ? { label: "Tampering detected - record does not match the blockchain", tone: "warning" }
+    : baseVerdict
+    ? VERDICT_META[baseVerdict]
+    : null;
 
   return (
     <>
@@ -146,16 +162,17 @@ export function VerifyPage() {
                     <th>Recalled</th>
                     <td>{result.verify.recalled ? "Yes" : "No"}</td>
                   </tr>
-                  <tr>
-                    <th>Off-chain data integrity</th>
-                    <td>
-                      <IntegrityCell integrity={result.integrity} />
-                    </td>
-                  </tr>
                 </tbody>
               </table>
             </div>
           )}
+        </div>
+      )}
+
+      {result && result.verify.exists && result.supplyChain && (
+        <div className="card">
+          <div className="card-title">Supply chain integrity</div>
+          <SupplyChainIntegrity supplyChain={result.supplyChain} />
         </div>
       )}
 
@@ -169,26 +186,120 @@ export function VerifyPage() {
   );
 }
 
-async function checkOffchainIntegrity(verify) {
-  const { data, error } = await tryFetch(() => offchainApi.getBatch(verify.batchId));
+/// For each supply-chain stage, recomputes the hash of the off-chain record
+/// snapshot taken at that checkpoint and compares it against the hash that
+/// was anchored on-chain for THAT SAME checkpoint (not just one hash for
+/// the whole batch). This is what lets a mismatch be localised to the
+/// first stage where the off-chain copy and the blockchain stop agreeing,
+/// instead of only being able to say "something, somewhere, doesn't match".
+async function checkSupplyChainIntegrity(unitId, history) {
+  const onchainCheckpoints = history.filter((h) => h.recordHash && h.recordHash !== ZERO_BYTES32);
+
+  const { data, error } = await tryFetch(() => offchainApi.getCheckpoints(unitId));
   if (error) {
-    return { status: error.status === 404 ? "not_found" : "error", message: error.message };
+    return { status: "error", message: error.message, rows: [], auditLog: [] };
   }
-  const recomputed = hashRecord(data.details);
-  const matches = recomputed === verify.batchDataHash;
-  return { status: matches ? "match" : "mismatch", details: data.details };
+  const offchainCheckpoints = data.checkpoints;
+
+  const rows = STAGE_SEQUENCE.map((stage, i) => {
+    const onchain = onchainCheckpoints[i];
+    const offchain = offchainCheckpoints[i];
+    if (!onchain || !offchain) {
+      return { stage, status: "not_reached" };
+    }
+    const sqlHash = hashRecord(offchain.snapshot);
+    const matches = sqlHash === onchain.recordHash;
+    return {
+      stage,
+      status: matches ? "verified" : "tampered",
+      actor: offchain.actor,
+      sqlHash,
+      blockchainHash: onchain.recordHash,
+      timestamp: Number(onchain.timestamp),
+    };
+  });
+
+  const firstTampered = rows.find((r) => r.status === "tampered");
+  return {
+    status: firstTampered ? "tampered" : "ok",
+    affectedStage: firstTampered ? firstTampered.stage : null,
+    rows,
+    auditLog: data.auditLog,
+  };
 }
 
-function IntegrityCell({ integrity }) {
-  if (!integrity) return <span>-</span>;
-  if (integrity.status === "match") {
-    return <span style={{ color: "#15803d", fontWeight: 600 }}>Hash match - off-chain record is untampered</span>;
+function SupplyChainIntegrity({ supplyChain }) {
+  if (supplyChain.status === "error") {
+    return <StatusBanner tone="warning">Could not reach the off-chain service: {supplyChain.message}</StatusBanner>;
   }
-  if (integrity.status === "mismatch") {
-    return <span style={{ color: "#dc2626", fontWeight: 600 }}>Hash mismatch - off-chain record does not match the chain</span>;
+
+  return (
+    <>
+      {supplyChain.status === "tampered" && (
+        <StatusBanner tone="error">
+          First affected checkpoint: <strong>{supplyChain.affectedStage}</strong>. The off-chain record held at this
+          stage no longer matches the hash that was anchored on-chain when this stage took custody.
+        </StatusBanner>
+      )}
+      <table className="data-table">
+        <thead>
+          <tr>
+            <th>Stage</th>
+            <th>Actor</th>
+            <th>SQL hash</th>
+            <th>Blockchain hash</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          {supplyChain.rows.map((row) => (
+            <StageRow key={row.stage} row={row} auditLog={supplyChain.auditLog} />
+          ))}
+        </tbody>
+      </table>
+    </>
+  );
+}
+
+function StageRow({ row, auditLog }) {
+  if (row.status === "not_reached") {
+    return (
+      <tr>
+        <td>{row.stage}</td>
+        <td colSpan={4} className="mono" style={{ color: "#9ca3af" }}>
+          Not reached
+        </td>
+      </tr>
+    );
   }
-  if (integrity.status === "not_found") {
-    return <span style={{ color: "#d97706" }}>No off-chain product record found to check</span>;
-  }
-  return <span style={{ color: "#d97706" }}>Could not reach the off-chain service: {integrity.message}</span>;
+
+  const change = row.status === "tampered" ? [...(auditLog || [])].reverse().find((a) => a.stage === row.stage) : null;
+
+  return (
+    <>
+      <tr>
+        <td>{row.stage}</td>
+        <td>
+          <AddressTag address={row.actor} />
+        </td>
+        <td>
+          <HashTag hash={row.sqlHash} />
+        </td>
+        <td>
+          <HashTag hash={row.blockchainHash} />
+        </td>
+        <td style={{ color: row.status === "verified" ? "#15803d" : "#dc2626", fontWeight: 600 }}>
+          {row.status === "verified" ? "Verified" : "Tampered"}
+        </td>
+      </tr>
+      {change && (
+        <tr>
+          <td></td>
+          <td colSpan={4} style={{ color: "#dc2626" }}>
+            Affected field: <strong>{change.field}</strong> (was {JSON.stringify(change.oldValue)}, now {JSON.stringify(change.newValue)})
+          </td>
+        </tr>
+      )}
+    </>
+  );
 }

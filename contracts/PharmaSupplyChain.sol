@@ -88,6 +88,11 @@ contract PharmaSupplyChain {
         address to;
         UnitStatus status;
         uint64 timestamp;
+        // Hash of the off-chain record snapshot taken at this checkpoint
+        // (manufacture, each accepted handover, dispense). bytes32(0) means
+        // no new snapshot was taken at this entry (InTransit/Flagged), so
+        // verification should fall back to the most recent non-zero one.
+        bytes32 recordHash;
     }
 
     mapping(address => Participant) public participants;
@@ -197,7 +202,7 @@ contract PharmaSupplyChain {
             if (units[unitId].status != UnitStatus.None) revert DuplicateUnit();
 
             units[unitId] = Unit(batchId, msg.sender, address(0), UnitStatus.Manufactured);
-            custodyHistory[unitId].push(CustodyRecord(address(0), msg.sender, UnitStatus.Manufactured, uint64(block.timestamp)));
+            custodyHistory[unitId].push(CustodyRecord(address(0), msg.sender, UnitStatus.Manufactured, uint64(block.timestamp), dataHash));
             emit CustodyChanged(unitId, address(0), msg.sender, UnitStatus.Manufactured, uint64(block.timestamp));
         }
 
@@ -240,14 +245,20 @@ contract PharmaSupplyChain {
 
             u.pendingReceiver = to;
             u.status = UnitStatus.InTransit;
-            custodyHistory[unitId].push(CustodyRecord(msg.sender, to, UnitStatus.InTransit, uint64(block.timestamp)));
+            custodyHistory[unitId].push(CustodyRecord(msg.sender, to, UnitStatus.InTransit, uint64(block.timestamp), bytes32(0)));
             emit CustodyChanged(unitId, msg.sender, to, UnitStatus.InTransit, uint64(block.timestamp));
             emit TransferInitiated(unitId, msg.sender, to);
         }
     }
 
-    function acceptTransfer(bytes32[] calldata unitIds) external onlyActive {
+    /// @param recordHashes One checkpoint hash per unit in `unitIds` (same
+    /// length, same order): the keccak256 hash of the off-chain record as
+    /// held by the receiver at the moment of accepting custody. This lets
+    /// verification localise a later mismatch to the first checkpoint where
+    /// the recomputed off-chain hash stops matching the on-chain one.
+    function acceptTransfer(bytes32[] calldata unitIds, bytes32[] calldata recordHashes) external onlyActive {
         if (unitIds.length == 0 || unitIds.length > MAX_TRANSFER_BATCH) revert InvalidArrayLength();
+        if (unitIds.length != recordHashes.length) revert InvalidArrayLength();
 
         for (uint256 i = 0; i < unitIds.length; i++) {
             bytes32 unitId = unitIds[i];
@@ -266,7 +277,7 @@ contract PharmaSupplyChain {
             u.currentHolder = msg.sender;
             u.pendingReceiver = address(0);
             u.status = UnitStatus.Received;
-            custodyHistory[unitId].push(CustodyRecord(previousHolder, msg.sender, UnitStatus.Received, uint64(block.timestamp)));
+            custodyHistory[unitId].push(CustodyRecord(previousHolder, msg.sender, UnitStatus.Received, uint64(block.timestamp), recordHashes[i]));
             emit CustodyChanged(unitId, previousHolder, msg.sender, UnitStatus.Received, uint64(block.timestamp));
             emit TransferAccepted(unitId, msg.sender);
         }
@@ -274,7 +285,9 @@ contract PharmaSupplyChain {
 
     // --- Dispensing (Pharmacy holder only) ---
 
-    function dispense(bytes32 unitId, bytes32 prescriptionHash) external onlyRole(Role.Pharmacy) returns (bool) {
+    /// @param recordHash Checkpoint hash of the off-chain record as held by
+    /// the dispensing pharmacy at the moment of dispensing.
+    function dispense(bytes32 unitId, bytes32 prescriptionHash, bytes32 recordHash) external onlyRole(Role.Pharmacy) returns (bool) {
         Unit storage u = units[unitId];
 
         if (u.status == UnitStatus.None) {
@@ -302,7 +315,7 @@ contract PharmaSupplyChain {
         }
 
         u.status = UnitStatus.Dispensed;
-        custodyHistory[unitId].push(CustodyRecord(msg.sender, address(0), UnitStatus.Dispensed, uint64(block.timestamp)));
+        custodyHistory[unitId].push(CustodyRecord(msg.sender, address(0), UnitStatus.Dispensed, uint64(block.timestamp), recordHash));
         emit CustodyChanged(unitId, msg.sender, address(0), UnitStatus.Dispensed, uint64(block.timestamp));
         emit Dispensed(unitId, msg.sender, prescriptionHash);
         return true;
@@ -313,7 +326,7 @@ contract PharmaSupplyChain {
     function _flag(bytes32 unitId, address actor, SuspiciousReason reason) private {
         Unit storage u = units[unitId];
         u.status = UnitStatus.Flagged;
-        custodyHistory[unitId].push(CustodyRecord(u.currentHolder, u.currentHolder, UnitStatus.Flagged, uint64(block.timestamp)));
+        custodyHistory[unitId].push(CustodyRecord(u.currentHolder, u.currentHolder, UnitStatus.Flagged, uint64(block.timestamp), bytes32(0)));
         emit CustodyChanged(unitId, u.currentHolder, u.currentHolder, UnitStatus.Flagged, uint64(block.timestamp));
         emit SuspiciousActivity(unitId, actor, reason);
     }

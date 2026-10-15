@@ -68,10 +68,14 @@ via `eth-gas-reporter` in the Truffle test suite):
   write plus a `CustodyRecord` push, per unit, in the loop). 100 units costs
   ~11.85M gas — 39.5% of Ganache's default 30,000,000 block gas limit,
   leaving room for other transactions in the same block.
-- `initiateTransfer`'s marginal cost is ~65,200 gas/unit and
-  `acceptTransfer`'s is ~68,000 gas/unit (each touches an *existing* `Unit`
-  via a storage read-modify-write, plus a `CustodyRecord` push). 50 units
-  costs ~3.3–3.4M gas — about 11% of the block limit.
+- `initiateTransfer`'s marginal cost is ~65,200 gas/unit (it does not write a
+  checkpoint — see below — so this is unchanged). `acceptTransfer`'s is
+  ~117,200 gas/unit: each touches an *existing* `Unit` via a storage
+  read-modify-write, plus a `CustodyRecord` push that now also stores a
+  `recordHash` (an extra non-zero `SSTORE`, the single largest line item in
+  the EVM's gas schedule), up from ~68,000 gas/unit before that field
+  existed. 50 units now costs ~5.9M gas — about 19.5% of the block limit,
+  still comfortably under it.
 
 Both caps are documented with these exact figures directly as comments in
 the contract, not just here, so the rationale travels with the code.

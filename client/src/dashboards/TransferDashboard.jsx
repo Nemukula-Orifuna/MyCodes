@@ -10,6 +10,7 @@ import { StatCard, StatGrid } from "../components/StatCard";
 import { TruckIcon, PackageIcon } from "../components/Icon";
 import { ADDRESS_RE } from "../lib/ids";
 import { UNIT_STATUS_NAMES } from "../lib/constants";
+import { offchainApi } from "../lib/offchainApi";
 
 export function TransferDashboard({ title, subtitle, allowOutgoing }) {
   const { contract, account } = useWeb3();
@@ -26,7 +27,7 @@ export function TransferDashboard({ title, subtitle, allowOutgoing }) {
       </StatGrid>
 
       <div className="grid-2">
-        <IncomingCard units={incoming} contract={contract} account={account} loading={loading} onDone={refresh} />
+        <IncomingCard units={incoming} contract={contract} account={account} loading={loading} onDone={refresh} stageLabel={title} />
         {allowOutgoing && <OutgoingCard units={holding} contract={contract} account={account} loading={loading} onDone={refresh} />}
       </div>
     </>
@@ -46,13 +47,25 @@ function useSelection() {
   return { selected, toggle, clear: () => setSelected(new Set()) };
 }
 
-export function IncomingCard({ units, contract, account, loading, onDone }) {
+export function IncomingCard({ units, contract, account, loading, onDone, stageLabel = "Pharmacy" }) {
   const { selected, toggle, clear } = useSelection();
   const { run, status, error } = useTransaction();
 
   async function accept() {
     if (selected.size === 0) return;
-    const result = await run(() => contract.methods.acceptTransfer([...selected]).send({ from: account }));
+    const unitIds = [...selected];
+    const result = await run(async () => {
+      // One fresh off-chain snapshot per unit, taken at the moment this
+      // receiver accepts it - its hash is what gets anchored on-chain for
+      // THIS checkpoint, independent of every other stage's snapshot.
+      const checkpoints = await Promise.all(
+        unitIds.map((unitId) => {
+          const unit = units.find((u) => u.unitId === unitId);
+          return offchainApi.createCheckpoint(unitId, unit.batchId, stageLabel, account);
+        })
+      );
+      return contract.methods.acceptTransfer(unitIds, checkpoints.map((c) => c.recordHash)).send({ from: account });
+    });
     if (result) {
       clear();
       onDone();

@@ -2,8 +2,12 @@
 const fs = require("fs");
 const path = require("path");
 const { WorkloadModuleBase } = require("@hyperledger/caliper-core");
+const Web3Utils = require("web3-utils");
 
 const SEED_PATH = path.join(__dirname, "..", "results", "seed-acceptTransfer.json");
+// Content is irrelevant for a gas/latency benchmark - every call needs *a*
+// valid bytes32 checkpoint hash, not a specific one.
+const PLACEHOLDER_RECORD_HASH = Web3Utils.keccak256("caliper-acceptTransfer-checkpoint");
 
 class AcceptTransferWorkload extends WorkloadModuleBase {
   constructor() {
@@ -38,7 +42,7 @@ class AcceptTransferWorkload extends WorkloadModuleBase {
     const request = {
       contract: "pharmaSupplyChain",
       verb: "acceptTransfer",
-      args: [[unitId]],
+      args: [[unitId], [PLACEHOLDER_RECORD_HASH]],
       readOnly: false,
     };
     await this.sutAdapter.sendRequests(request);

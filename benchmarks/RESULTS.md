@@ -6,6 +6,14 @@ below is read directly from those files / the tools' own generated reports
 (`caliper/results/{instant,fixed-blocktime}/*-report.html`,
 `jmeter/results/html-report/index.html`) - nothing here is estimated or rounded away.
 
+**Re-run note**: the Caliper section below (on-chain workloads only) was re-measured
+in full after `PharmaSupplyChain.sol` was extended with a per-checkpoint record-hash
+mechanism (one hash anchored per unit per supply-chain stage reached, instead of one
+hash per batch at registration only - see `DESIGN_NOTES.md`), which changed
+`acceptTransfer`'s and `dispense`'s gas cost. The JMeter section is unaffected (it
+exercises off-chain API routes and `verify()`, neither of whose signature changed)
+and is reported as originally measured.
+
 ## Method
 
 - **Contract**: `PharmaSupplyChain.sol` deployed fresh for each mining-mode run via
@@ -38,64 +46,60 @@ below is read directly from those files / the tools' own generated reports
 
 | Mining mode | Workload | Rate (tps) | Submitted | Succ | Fail | Avg latency (s) | Max latency (s) | Throughput (tps) |
 |---|---|---|---|---|---|---|---|---|
-| instant | registerBatch | 5 | 41 | 41 | 0 | 0.05 | 0.07 | 5.1 |
-| instant | registerBatch | 10 | 81 | 81 | 0 | 0.04 | 0.07 | 10.1 |
-| instant | initiateTransfer | 5 | 41 | 41 | 0 | 0.03 | 0.05 | 5.1 |
+| instant | registerBatch | 5 | 41 | 41 | 0 | 0.05 | 0.08 | 5.1 |
+| instant | registerBatch | 10 | 81 | 81 | 0 | 0.05 | 0.07 | 10.1 |
+| instant | initiateTransfer | 5 | 41 | 41 | 0 | 0.04 | 0.05 | 5.1 |
 | instant | initiateTransfer | 10 | 81 | 81 | 0 | 0.03 | 0.05 | 10.1 |
-| instant | acceptTransfer | 5 | 41 | 41 | 0 | 0.04 | 0.05 | 5.0 |
-| instant | acceptTransfer | 10 | 81 | 81 | 0 | 0.03 | 0.05 | 10.1 |
-| instant | dispense | 5 | 41 | 41 | 0 | 0.03 | 0.05 | 5.1 |
+| instant | acceptTransfer | 5 | 41 | 41 | 0 | 0.05 | 0.10 | 5.1 |
+| instant | acceptTransfer | 10 | 81 | 81 | 0 | 0.04 | 0.06 | 10.1 |
+| instant | dispense | 5 | 41 | 41 | 0 | 0.04 | 0.06 | 5.1 |
 | instant | dispense | 10 | 81 | 81 | 0 | 0.04 | 0.06 | 10.1 |
-| instant | verify | 5 | 41 | 41 | 0 | 0.01 | 0.03 | 5.1 |
-| instant | verify | 10 | 81 | 81 | 0 | 0.01 | 0.03 | 10.1 |
-| fixed-blocktime-2s | registerBatch | 5 | 41 | **16** | **25** | 1.10 | 2.41 | **0.4** |
-| fixed-blocktime-2s | registerBatch | 10 | 81 | 81 | 0 | 1.49 | 3.18 | 8.2 |
-| fixed-blocktime-2s | initiateTransfer | 5 | 41 | 41 | 0 | 1.22 | 2.49 | 5.1 |
-| fixed-blocktime-2s | initiateTransfer | 10 | 81 | 81 | 0 | 1.57 | 3.41 | 8.1 |
-| fixed-blocktime-2s | acceptTransfer | 5 | 41 | 41 | 0 | 1.26 | 2.49 | 4.7 |
-| fixed-blocktime-2s | acceptTransfer | 10 | 81 | 81 | 0 | 1.62 | 3.50 | 9.6 |
-| fixed-blocktime-2s | dispense | 5 | 41 | 41 | 0 | 1.30 | 2.48 | 4.4 |
-| fixed-blocktime-2s | dispense | 10 | 81 | 81 | 0 | 1.54 | 3.38 | 9.8 |
-| fixed-blocktime-2s | verify | 5 | 41 | 41 | 0 | 0.02 | 0.04 | 5.1 |
-| fixed-blocktime-2s | verify | 10 | 81 | 81 | 0 | 0.02 | 0.04 | 10.1 |
+| instant | verify | 5 | 41 | 41 | 0 | 0.02 | 0.03 | 5.1 |
+| instant | verify | 10 | 81 | 81 | 0 | 0.02 | 0.03 | 10.1 |
+| fixed-blocktime-2s | registerBatch | 5 | 41 | 41 | 0 | 1.30 | 2.51 | 4.3 |
+| fixed-blocktime-2s | registerBatch | 10 | 81 | 81 | 0 | 1.57 | 3.39 | 9.7 |
+| fixed-blocktime-2s | initiateTransfer | 5 | 41 | 41 | 0 | 1.20 | 2.28 | 4.6 |
+| fixed-blocktime-2s | initiateTransfer | 10 | 81 | 81 | 0 | 1.33 | 2.69 | 9.0 |
+| fixed-blocktime-2s | acceptTransfer | 5 | 41 | 41 | 0 | 1.22 | 2.31 | 4.6 |
+| fixed-blocktime-2s | acceptTransfer | 10 | 81 | 81 | 0 | 1.35 | 2.78 | 8.8 |
+| fixed-blocktime-2s | dispense | 5 | 41 | 41 | 0 | 1.31 | 2.35 | 4.4 |
+| fixed-blocktime-2s | dispense | 10 | 81 | 81 | 0 | 1.40 | 2.87 | 8.8 |
+| fixed-blocktime-2s | verify | 5 | 41 | 41 | 0 | 0.02 | 0.02 | 5.1 |
+| fixed-blocktime-2s | verify | 10 | 81 | 81 | 0 | 0.02 | 0.02 | 10.1 |
 
 ### Reading these numbers
 
 **Instant mining dramatically overstates real-world performance.** Average
-confirmation latency for every write workload is ~30-50ms under instant mining
-versus ~1.1-1.6s under a 2-second fixed block time - roughly a 30-40x difference for
+confirmation latency for every write workload is ~40-60ms under instant mining
+versus ~1.2-1.6s under a 2-second fixed block time - roughly a 25-40x difference for
 the identical contract call. `verify()` is the one exception: being a `view` call it
-never waits for a block at all, so its latency (~10-20ms) is essentially unaffected
-by mining mode in either direction. **This asymmetry is the headline finding**: a
-dapp whose UI is tuned against an instant-mining devnet will feel 30-40x slower the
+never waits for a block at all, so its latency (~20ms) is essentially unaffected by
+mining mode in either direction. **This asymmetry is the headline finding**: a dapp
+whose UI is tuned against an instant-mining devnet will feel 25-35x slower the
 moment it points at a real network with real block times, for every state-changing
 operation - only read-heavy flows (like the public verify page) will feel the same.
 
-**The registerBatch-5tps anomaly is real and is reported as observed, not
-smoothed over.** Of 41 submitted transactions, only 16 confirmed within Web3.js's
-default 50-block confirmation-polling window; the other 25 failed client-side with
-"Transaction was not mined within 50 blocks" even though they were validly
-submitted (nonces 0x10-0x28 are a contiguous block, consistent with a client-side
-polling/subscription issue rather than an on-chain rejection - Ganache's own log
-shows these transactions did land in blocks). This did not recur in
-`registerBatch-10tps` run moments later in the same process, nor in any other
-workload's first round, so it reads as a cold-start quirk in Web3.js 1.x's
-WebSocket-based confirmation-subscription mechanism specifically on the first batch
-of transactions sent after connecting - not a flaw in the contract (no transaction
-actually reverted on-chain) and not a pattern repeated elsewhere in this dataset.
-It is left in the results rather than re-run, per the "do not invent or round away
-numbers" instruction: a production client would need to handle exactly this kind of
-confirmation-tracking edge case robustly, which is itself a relevant finding for a
-counterfeit-detection system where a stuck "pending" state has real consequences.
+**This re-run produced zero failures across every round, including
+registerBatch-5tps.** An earlier run of this same benchmark (before the
+per-checkpoint hashing extension) recorded a registerBatch-5tps anomaly - only 16 of
+41 transactions confirming within Web3.js's default 50-block polling window, traced
+to a client-side confirmation-subscription issue rather than an on-chain rejection,
+and explicitly diagnosed at the time as a one-off cold-start quirk rather than a
+recurring defect. This full re-run, run back to back across all five workloads at
+both rates and both mining modes, confirms that diagnosis: no round in this dataset
+shows any submitted-but-unconfirmed transaction.
 
-**registerBatch costs roughly double every other write call under load**, visible
-even at matching throughput (10tps fixed-blocktime: registerBatch avg 1.49s vs.
-initiateTransfer/acceptTransfer/dispense at 1.22-1.62s - comparable, but
-registerBatch's *max* latency (3.18s) and its total gas footprint from Phase 2
-(~239k vs ~94-97k gas for the transfer/dispense calls) point the same direction) -
-consistent with it being the only workload here that writes a brand-new `Batch`
-struct in addition to a `Unit` struct and a `CustodyRecord` push, where the others
-only touch an already-existing `Unit`.
+**acceptTransfer and dispense now cost close to what registerBatch costs under
+load, not roughly half of it as in the originally measured dataset.** Extending the
+contract so that acceptTransfer and dispense each anchor a per-checkpoint record
+hash (`DESIGN_NOTES.md`) added one non-zero `SSTORE` to each call, which the Truffle
+gas report (Section 4.5.2(E) in Chapter 4) shows raised acceptTransfer's marginal
+cost from ~68,000 to ~117,200 gas/unit; dispense is now ~90-116k gas depending on
+which branch it takes. At matching throughput (10tps fixed-blocktime): registerBatch
+avg 1.57s, initiateTransfer (which writes no checkpoint, and is now the cheapest
+write workload) avg 1.33s, acceptTransfer avg 1.35s, dispense avg 1.40s - all four
+now cluster within a narrow band, rather than registerBatch standing out roughly
+twice as expensive as the rest.
 
 ## JMeter: off-chain API and public verify flow
 

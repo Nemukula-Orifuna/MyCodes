@@ -53,11 +53,16 @@ function main() {
             // correctly-addressed send ever happens - a bug in the connector,
             // not in this contract (confirmed by reproducing the exact same
             // call directly with Web3, which succeeds once `from` is explicit).
+            // acceptTransfer/dispense now also write a checkpoint record
+            // hash per unit (see PharmaSupplyChain.sol), which raised their
+            // measured gas cost from ~68-72k to ~117k (acceptTransfer) and
+            // ~90-92k (dispense) in the Truffle gas report - bumped to stay
+            // at roughly 2x measured, same policy as the other limits.
             gas: {
               registerBatch: 500000,
               initiateTransfer: 200000,
-              acceptTransfer: 200000,
-              dispense: 200000,
+              acceptTransfer: 250000,
+              dispense: 250000,
               verify: 100000,
             },
           },

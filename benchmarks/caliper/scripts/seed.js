@@ -55,6 +55,13 @@ async function main() {
     return out;
   }
 
+  // acceptTransfer now takes one checkpoint hash per unit; content is
+  // irrelevant here, this is seeding on-chain state, not the benchmark.
+  const PLACEHOLDER_RECORD_HASH = web3.utils.keccak256("seed-checkpoint");
+  function hashesFor(batch) {
+    return batch.map(() => PLACEHOLDER_RECORD_HASH);
+  }
+
   // 1. Register enough fresh batches (as Manufacturer) to produce `count` units.
   const batchLabel = `seed-${stage}-${Date.now()}`;
   const unitIds = [];
@@ -89,19 +96,19 @@ async function main() {
       await contract.methods.initiateTransfer(batch, distributor).send({ from: manufacturer, gas: 8000000 });
     }
     for (const batch of chunk(unitIds, MAX_TRANSFER_BATCH)) {
-      await contract.methods.acceptTransfer(batch).send({ from: distributor, gas: 8000000 });
+      await contract.methods.acceptTransfer(batch, hashesFor(batch)).send({ from: distributor, gas: 8000000 });
     }
     for (const batch of chunk(unitIds, MAX_TRANSFER_BATCH)) {
       await contract.methods.initiateTransfer(batch, wholesaler).send({ from: distributor, gas: 8000000 });
     }
     for (const batch of chunk(unitIds, MAX_TRANSFER_BATCH)) {
-      await contract.methods.acceptTransfer(batch).send({ from: wholesaler, gas: 8000000 });
+      await contract.methods.acceptTransfer(batch, hashesFor(batch)).send({ from: wholesaler, gas: 8000000 });
     }
     for (const batch of chunk(unitIds, MAX_TRANSFER_BATCH)) {
       await contract.methods.initiateTransfer(batch, pharmacy).send({ from: wholesaler, gas: 8000000 });
     }
     for (const batch of chunk(unitIds, MAX_TRANSFER_BATCH)) {
-      await contract.methods.acceptTransfer(batch).send({ from: pharmacy, gas: 8000000 });
+      await contract.methods.acceptTransfer(batch, hashesFor(batch)).send({ from: pharmacy, gas: 8000000 });
     }
   }
 

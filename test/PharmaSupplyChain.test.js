@@ -46,7 +46,8 @@ contract("PharmaSupplyChain", (accounts) => {
       const manufactureDate = futureDate() - 3600;
       const expiryDate = pastExpiry() + 365 * 24 * 3600;
 
-      const regTx = await instance.registerBatch(batchId, bytes32From("product-data"), manufactureDate, expiryDate, [serial], {
+      const productDataHash = bytes32From("product-data");
+      const regTx = await instance.registerBatch(batchId, productDataHash, manufactureDate, expiryDate, [serial], {
         from: manufacturer,
       });
       assert.equal(regTx.logs.find((l) => l.event === "BatchRegistered").args.manufacturer, manufacturer);
@@ -56,24 +57,28 @@ contract("PharmaSupplyChain", (accounts) => {
       assert.equal(verify.status.toString(), UnitStatus.Manufactured.toString());
       assert.equal(verify.currentHolderRole.toString(), Role.Manufacturer.toString());
 
+      const distributorCheckpointHash = bytes32From("checkpoint-distributor");
       await instance.initiateTransfer([id], distributor, { from: manufacturer });
-      await instance.acceptTransfer([id], { from: distributor });
+      await instance.acceptTransfer([id], [distributorCheckpointHash], { from: distributor });
       verify = await instance.verify(id);
       assert.equal(verify.status.toString(), UnitStatus.Received.toString());
       assert.equal(verify.currentHolderRole.toString(), Role.Distributor.toString());
 
+      const wholesalerCheckpointHash = bytes32From("checkpoint-wholesaler");
       await instance.initiateTransfer([id], wholesaler, { from: distributor });
-      await instance.acceptTransfer([id], { from: wholesaler });
+      await instance.acceptTransfer([id], [wholesalerCheckpointHash], { from: wholesaler });
       verify = await instance.verify(id);
       assert.equal(verify.currentHolderRole.toString(), Role.Wholesaler.toString());
 
+      const pharmacyReceiveCheckpointHash = bytes32From("checkpoint-pharmacy-receive");
       await instance.initiateTransfer([id], pharmacy, { from: wholesaler });
-      await instance.acceptTransfer([id], { from: pharmacy });
+      await instance.acceptTransfer([id], [pharmacyReceiveCheckpointHash], { from: pharmacy });
       verify = await instance.verify(id);
       assert.equal(verify.currentHolderRole.toString(), Role.Pharmacy.toString());
       assert.equal(verify.status.toString(), UnitStatus.Received.toString());
 
-      const dispenseTx = await instance.dispense(id, bytes32From("prescription-ref"), { from: pharmacy });
+      const dispenseCheckpointHash = bytes32From("checkpoint-dispense");
+      const dispenseTx = await instance.dispense(id, bytes32From("prescription-ref"), dispenseCheckpointHash, { from: pharmacy });
       const dispensedEvent = dispenseTx.logs.find((l) => l.event === "Dispensed");
       assert.isDefined(dispensedEvent);
       assert.equal(dispensedEvent.args.pharmacy, pharmacy);
@@ -91,6 +96,68 @@ contract("PharmaSupplyChain", (accounts) => {
       assert.equal(history[7].to, "0x0000000000000000000000000000000000000000");
       assert.equal(history[0].from, "0x0000000000000000000000000000000000000000");
       assert.equal(history[0].to, manufacturer);
+
+      // Each checkpoint carries its own off-chain record hash; InTransit
+      // entries (proposals, not handovers) carry none.
+      assert.equal(history[0].recordHash, productDataHash, "Manufactured checkpoint should carry the batch data hash");
+      assert.equal(history[1].recordHash, ZERO_BYTES32, "InTransit is not a checkpoint");
+      assert.equal(history[2].recordHash, distributorCheckpointHash);
+      assert.equal(history[4].recordHash, wholesalerCheckpointHash);
+      assert.equal(history[6].recordHash, pharmacyReceiveCheckpointHash);
+      assert.equal(history[7].recordHash, dispenseCheckpointHash);
+    });
+  });
+
+  // ---------------------------------------------------------------------
+  // Checkpoint-hash integrity (locating where an off-chain record diverged)
+  // ---------------------------------------------------------------------
+  describe("checkpoint hash integrity", () => {
+    it("acceptTransfer rejects a unitIds/recordHashes length mismatch", async () => {
+      await registerStandardChain();
+      const batchId = bytes32From("batch-mismatch");
+      await instance.registerBatch(batchId, bytes32From("d"), futureDate(), futureDate() + 10000, [1, 2], { from: manufacturer });
+      const idA = unitId(batchId, 1);
+      const idB = unitId(batchId, 2);
+      await instance.initiateTransfer([idA, idB], distributor, { from: manufacturer });
+
+      await expectCustomError(
+        instance.acceptTransfer([idA, idB], [bytes32From("only-one")], { from: distributor }),
+        "InvalidArrayLength"
+      );
+    });
+
+    it("lets a caller recompute each checkpoint's hash and locate the first one that no longer matches", async () => {
+      // Simulates the off-chain side of verification: for each non-zero
+      // checkpoint, the caller recomputes the record it holds for that stage
+      // and compares it against what was stored on-chain at that checkpoint.
+      await registerStandardChain();
+      const batchId = bytes32From("batch-localise");
+      await instance.registerBatch(batchId, bytes32From("mfr-record"), futureDate(), futureDate() + 10000, [1], { from: manufacturer });
+      const id = unitId(batchId, 1);
+
+      const distHash = bytes32From("dist-record");
+      await instance.initiateTransfer([id], distributor, { from: manufacturer });
+      await instance.acceptTransfer([id], [distHash], { from: distributor });
+
+      const pharmHash = bytes32From("pharm-record");
+      await instance.initiateTransfer([id], wholesaler, { from: distributor });
+      await instance.acceptTransfer([id], [bytes32From("whsl-record")], { from: wholesaler });
+      await instance.initiateTransfer([id], pharmacy, { from: wholesaler });
+      await instance.acceptTransfer([id], [pharmHash], { from: pharmacy });
+
+      const history = await instance.getHistory(id);
+      // Off-chain side recomputes a hash per stage; here the distributor's
+      // snapshot was tampered with after the fact, so its recomputed hash no
+      // longer equals the one captured on-chain at that checkpoint, while
+      // the manufacturer and pharmacy checkpoints still match.
+      const recomputed = {
+        [history[0].recordHash]: bytes32From("mfr-record"), // manufacturer: untouched
+        [history[2].recordHash]: bytes32From("TAMPERED"), // distributor: tampered after the fact
+        [history[6].recordHash]: pharmHash, // pharmacy: untouched
+      };
+      const checkpoints = [history[0], history[2], history[6]];
+      const firstMismatch = checkpoints.find((c) => recomputed[c.recordHash] !== c.recordHash);
+      assert.equal(firstMismatch, checkpoints[1], "the distributor checkpoint should be the first to diverge");
     });
   });
 
@@ -120,7 +187,7 @@ contract("PharmaSupplyChain", (accounts) => {
 
       await instance.suspendParticipant(suspendedDistributor, { from: regulator });
 
-      await expectCustomError(instance.acceptTransfer([id], { from: suspendedDistributor }), "Unauthorized");
+      await expectCustomError(instance.acceptTransfer([id], [bytes32From("checkpoint")], { from: suspendedDistributor }), "Unauthorized");
     });
 
     it("rejects a transfer to the wrong next role", async () => {
@@ -145,7 +212,7 @@ contract("PharmaSupplyChain", (accounts) => {
       await instance.registerBatch(batchId, bytes32From("d"), futureDate(), futureDate() + 10000, [1], { from: manufacturer });
       const id = unitId(batchId, 1);
 
-      await expectCustomError(instance.dispense(id, bytes32From("rx"), { from: distributor }), "Unauthorized");
+      await expectCustomError(instance.dispense(id, bytes32From("rx"), bytes32From("checkpoint"), { from: distributor }), "Unauthorized");
     });
   });
 
@@ -165,7 +232,7 @@ contract("PharmaSupplyChain", (accounts) => {
       assert.equal(verify.currentHolderRole.toString(), Role.Manufacturer.toString());
       assert.equal(verify.status.toString(), UnitStatus.InTransit.toString());
 
-      await instance.acceptTransfer([id], { from: distributor });
+      await instance.acceptTransfer([id], [bytes32From("checkpoint")], { from: distributor });
       verify = await instance.verify(id);
       assert.equal(verify.currentHolderRole.toString(), Role.Distributor.toString());
       assert.equal(verify.status.toString(), UnitStatus.Received.toString());
@@ -177,7 +244,7 @@ contract("PharmaSupplyChain", (accounts) => {
       const id = unitId(batchId, 1);
 
       await instance.initiateTransfer([id], distributor, { from: manufacturer });
-      await expectCustomError(instance.acceptTransfer([id], { from: wholesaler }), "NotPendingReceiver");
+      await expectCustomError(instance.acceptTransfer([id], [bytes32From("checkpoint")], { from: wholesaler }), "NotPendingReceiver");
     });
   });
 
@@ -191,11 +258,11 @@ contract("PharmaSupplyChain", (accounts) => {
       await instance.registerBatch(batchId, bytes32From("d"), futureDate(), futureDate() + 10000, [serial], { from: manufacturer });
       const id = unitId(batchId, serial);
       await instance.initiateTransfer([id], distributor, { from: manufacturer });
-      await instance.acceptTransfer([id], { from: distributor });
+      await instance.acceptTransfer([id], [bytes32From("checkpoint")], { from: distributor });
       await instance.initiateTransfer([id], wholesaler, { from: distributor });
-      await instance.acceptTransfer([id], { from: wholesaler });
+      await instance.acceptTransfer([id], [bytes32From("checkpoint")], { from: wholesaler });
       await instance.initiateTransfer([id], targetPharmacy, { from: wholesaler });
-      await instance.acceptTransfer([id], { from: targetPharmacy });
+      await instance.acceptTransfer([id], [bytes32From("checkpoint")], { from: targetPharmacy });
       return id;
     }
 
@@ -203,12 +270,12 @@ contract("PharmaSupplyChain", (accounts) => {
       const batchId = bytes32From("batch-clone");
       const id = await carryToPharmacy(batchId, 1, pharmacy);
 
-      const firstTx = await instance.dispense(id, bytes32From("rx-1"), { from: pharmacy });
+      const firstTx = await instance.dispense(id, bytes32From("rx-1"), bytes32From("checkpoint"), { from: pharmacy });
       assert.isTrue(firstTx.logs.some((l) => l.event === "Dispensed"));
 
       // Second pharmacy never legitimately held this unit on-chain, but a
       // cloned physical pack carries the same unitId.
-      const secondTx = await instance.dispense(id, bytes32From("rx-2"), { from: pharmacy2 });
+      const secondTx = await instance.dispense(id, bytes32From("rx-2"), bytes32From("checkpoint"), { from: pharmacy2 });
       const suspicious = secondTx.logs.find((l) => l.event === "SuspiciousActivity");
       assert.isDefined(suspicious, "expected SuspiciousActivity event");
       assert.equal(suspicious.args.reasonCode.toString(), SuspiciousReason.AlreadyDispensed.toString());
@@ -240,14 +307,14 @@ contract("PharmaSupplyChain", (accounts) => {
       const idHeldByPharmacy1 = unitId(batchId, 1);
 
       await instance.initiateTransfer([idHeldByPharmacy1], distributor, { from: manufacturer });
-      await instance.acceptTransfer([idHeldByPharmacy1], { from: distributor });
+      await instance.acceptTransfer([idHeldByPharmacy1], [bytes32From("checkpoint")], { from: distributor });
       await instance.initiateTransfer([idHeldByPharmacy1], wholesaler, { from: distributor });
-      await instance.acceptTransfer([idHeldByPharmacy1], { from: wholesaler });
+      await instance.acceptTransfer([idHeldByPharmacy1], [bytes32From("checkpoint")], { from: wholesaler });
       await instance.initiateTransfer([idHeldByPharmacy1], pharmacy, { from: wholesaler });
-      await instance.acceptTransfer([idHeldByPharmacy1], { from: pharmacy });
+      await instance.acceptTransfer([idHeldByPharmacy1], [bytes32From("checkpoint")], { from: pharmacy });
 
       // pharmacy2 never held this unit, but tries to dispense it.
-      const tx = await instance.dispense(idHeldByPharmacy1, bytes32From("rx"), { from: pharmacy2 });
+      const tx = await instance.dispense(idHeldByPharmacy1, bytes32From("rx"), bytes32From("checkpoint"), { from: pharmacy2 });
       const suspicious = tx.logs.find((l) => l.event === "SuspiciousActivity");
       assert.isDefined(suspicious);
       assert.equal(suspicious.args.reasonCode.toString(), SuspiciousReason.NotHolder.toString());
@@ -262,7 +329,7 @@ contract("PharmaSupplyChain", (accounts) => {
 
       await instance.recallBatch(batchId, { from: regulator });
 
-      const tx = await instance.dispense(id, bytes32From("rx"), { from: pharmacy });
+      const tx = await instance.dispense(id, bytes32From("rx"), bytes32From("checkpoint"), { from: pharmacy });
       const suspicious = tx.logs.find((l) => l.event === "SuspiciousActivity");
       assert.isDefined(suspicious);
       assert.equal(suspicious.args.reasonCode.toString(), SuspiciousReason.RecalledBatch.toString());
@@ -291,7 +358,7 @@ contract("PharmaSupplyChain", (accounts) => {
 
     it("flags an unknown unit ID presented at dispense", async () => {
       const bogusId = unitId(bytes32From("no-such-batch"), 999);
-      const tx = await instance.dispense(bogusId, bytes32From("rx"), { from: pharmacy });
+      const tx = await instance.dispense(bogusId, bytes32From("rx"), bytes32From("checkpoint"), { from: pharmacy });
       const suspicious = tx.logs.find((l) => l.event === "SuspiciousActivity");
       assert.isDefined(suspicious);
       assert.equal(suspicious.args.reasonCode.toString(), SuspiciousReason.UnknownUnit.toString());
@@ -346,12 +413,12 @@ contract("PharmaSupplyChain", (accounts) => {
       const id = unitId(batchId, 1);
 
       await instance.initiateTransfer([id], distributor, { from: manufacturer });
-      await instance.acceptTransfer([id], { from: distributor });
+      await instance.acceptTransfer([id], [bytes32From("checkpoint")], { from: distributor });
       await instance.initiateTransfer([id], wholesaler, { from: distributor });
-      await instance.acceptTransfer([id], { from: wholesaler });
+      await instance.acceptTransfer([id], [bytes32From("checkpoint")], { from: wholesaler });
       await instance.initiateTransfer([id], pharmacy, { from: wholesaler });
-      await instance.acceptTransfer([id], { from: pharmacy });
-      const dispenseTx = await instance.dispense(id, bytes32From("prescription-ref"), { from: pharmacy });
+      await instance.acceptTransfer([id], [bytes32From("checkpoint")], { from: pharmacy });
+      const dispenseTx = await instance.dispense(id, bytes32From("prescription-ref"), bytes32From("checkpoint"), { from: pharmacy });
 
       const batch = await instance.batches(batchId);
       const unit = await instance.units(id);
@@ -457,7 +524,7 @@ contract("PharmaSupplyChain", (accounts) => {
       await instance.registerBatch(batchId, bytes32From("d"), futureDate(), futureDate() + 10000, [1], { from: manufacturer });
       const id = unitId(batchId, 1);
       await instance.initiateTransfer([id], suspendedDistributor, { from: manufacturer });
-      await instance.acceptTransfer([id], { from: suspendedDistributor });
+      await instance.acceptTransfer([id], [bytes32From("checkpoint")], { from: suspendedDistributor });
 
       const verify = await instance.verify(id);
       assert.equal(verify.currentHolderRole.toString(), Role.Distributor.toString());

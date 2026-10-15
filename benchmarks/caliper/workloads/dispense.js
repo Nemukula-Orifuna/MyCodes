@@ -37,11 +37,12 @@ class DispenseWorkload extends WorkloadModuleBase {
     const unitId = this.unitIds[this.index];
     this.index += 1;
     const prescriptionHash = Web3Utils.keccak256(`caliper-dispense-${this.workerIndex}-${this.index}-${Date.now()}`);
+    const recordHash = Web3Utils.keccak256(`caliper-dispense-checkpoint-${this.workerIndex}-${this.index}-${Date.now()}`);
 
     const request = {
       contract: "pharmaSupplyChain",
       verb: "dispense",
-      args: [unitId, prescriptionHash],
+      args: [unitId, prescriptionHash, recordHash],
       readOnly: false,
     };
     await this.sutAdapter.sendRequests(request);

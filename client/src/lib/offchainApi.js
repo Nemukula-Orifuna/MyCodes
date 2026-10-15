@@ -22,6 +22,11 @@ export const offchainApi = {
   createPrescription: (prescriptionRef, details) =>
     request("/api/prescriptions", { method: "POST", body: JSON.stringify({ prescriptionRef, details }) }),
   getPrescription: (prescriptionRef) => request(`/api/prescriptions/${prescriptionRef}`),
+  createCheckpoint: (unitId, batchId, stage, actor) =>
+    request("/api/checkpoints", { method: "POST", body: JSON.stringify({ unitId, batchId, stage, actor }) }),
+  getCheckpoints: (unitId) => request(`/api/checkpoints/${unitId}`),
+  tamperCheckpoint: (checkpointId, field, value) =>
+    request(`/api/checkpoints/${checkpointId}/tamper`, { method: "PATCH", body: JSON.stringify({ field, value }) }),
 };
 
 /// Fetches a resource and returns { data, error } instead of throwing, for

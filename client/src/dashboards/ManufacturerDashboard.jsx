@@ -61,10 +61,13 @@ export function ManufacturerDashboard() {
     });
 
     if (result) {
-      setGeneratedUnits({
-        batchReference: form.batchReference,
-        units: serialNumbers.map((serial) => ({ serial, unitId: computeUnitId(batchId, serial) })),
-      });
+      const units = serialNumbers.map((serial) => ({ serial, unitId: computeUnitId(batchId, serial) }));
+      // Mirrors the Manufactured checkpoint the contract already recorded
+      // on-chain (registerBatch's dataHash) with its own off-chain snapshot
+      // row, so the verify page has one consistent place (per-unit
+      // checkpoint rows) to read every stage's record from.
+      await Promise.all(units.map((u) => offchainApi.createCheckpoint(u.unitId, batchId, "Manufacturer", account)));
+      setGeneratedUnits({ batchReference: form.batchReference, units });
       refreshHolding();
       refreshStats();
     }

@@ -35,7 +35,7 @@ export function PharmacyDashboard() {
       </StatGrid>
 
       <div className="grid-2">
-        <IncomingCard units={incoming} contract={contract} account={account} loading={loading} onDone={refresh} />
+        <IncomingCard units={incoming} contract={contract} account={account} loading={loading} onDone={refresh} stageLabel="Pharmacy" />
         <DispenseCard contract={contract} account={account} onDispensed={handleDispensed} />
       </div>
     </>
@@ -59,7 +59,12 @@ function DispenseCard({ contract, account, onDispensed }) {
       if (offchainRecord.prescriptionHash !== hashRecord(details)) {
         throw new Error("Off-chain prescription hash mismatch - refusing to anchor it on-chain.");
       }
-      return contract.methods.dispense(unitId, offchainRecord.prescriptionHash).send({ from: account });
+      // Final checkpoint: the batch record as held by this pharmacy at the
+      // moment of dispensing, snapshotted and hashed the same way as every
+      // earlier handover.
+      const unit = await contract.methods.units(unitId).call();
+      const checkpoint = await offchainApi.createCheckpoint(unitId, unit.batchId, "Dispensed", account);
+      return contract.methods.dispense(unitId, offchainRecord.prescriptionHash, checkpoint.recordHash).send({ from: account });
     });
 
     if (result) {
