@@ -943,17 +943,23 @@ table.data-table td {
   }
 }
 
-/* --- Standalone mockup-style shell (Verify page) --- */
+/* --- Standalone mockup-style shell (Verify page, batch-registration card) ---
+   Matches the supplied PharmaTrace preview template exactly: panel chrome,
+   header gradient, field/button metrics and the two table styles (plain
+   bordered .mock-kv for key/value pairs, header-row .mock-grid for the QR
+   and supply-chain tables), down to the template's own colour values. */
 
 .mock-shell {
   min-height: 100vh;
-  background: var(--slate-50);
+  background: #fff;
+  color: #172033;
+  font-family: Arial, Helvetica, sans-serif;
 }
 
 .mock-header {
-  height: 56px;
-  background: var(--mock-blue);
-  color: var(--white);
+  height: 38px;
+  background: linear-gradient(90deg, #32639e 0%, #356aa9 52%, #2e5d9a 100%);
+  color: #fff;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -965,18 +971,15 @@ table.data-table td {
 
 .mock-header-brand {
   font-weight: 700;
-  font-size: 17px;
-  letter-spacing: -0.01em;
+  font-size: 20px;
 }
 
 .mock-header-title {
-  font-size: 14px;
-  font-weight: 500;
-  color: rgba(255, 255, 255, 0.92);
+  font-size: 15px;
 }
 
 .mock-body {
-  padding: 40px 24px 60px;
+  padding: 28px 24px 60px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -985,55 +988,124 @@ table.data-table td {
 .mock-card {
   width: 100%;
   max-width: 560px;
-  background: var(--white);
-  border: 1px solid var(--mock-blue-border);
-  border-radius: 10px;
-  padding: 28px;
-  box-shadow: var(--shadow-sm);
+  background: #fff;
+  border: 1.5px solid #2f73c9;
+  border-radius: 4px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.025);
 }
 
 .mock-card + .mock-card {
   margin-top: 22px;
 }
 
+.mock-card-body {
+  padding: 24px 28px;
+}
+
 .mock-card-title {
-  font-size: 18px;
+  font-size: 17px;
   font-weight: 700;
-  margin: 0 0 18px;
-  color: var(--slate-900);
+  margin: 0 0 12px;
+}
+
+.mock-field-card {
+  border: 1px solid #e1e5ea;
+  background: #fff;
+  border-radius: 3px;
+  padding: 14px 16px;
+}
+
+.mock-field-row {
+  display: grid;
+  grid-template-columns: 150px 1fr;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 11px;
+}
+
+.mock-field-row span {
+  font-size: 12px;
+}
+
+.mock-field-row input {
+  height: 31px;
+  border: 1px solid #cdd7e3;
+  border-radius: 4px;
+  background: #fbfcfd;
+  padding: 0 12px;
+  font-size: 12px;
+  font-family: inherit;
+  width: 100%;
+}
+
+.mock-field-row input:focus {
+  outline: 2px solid #2f73c9;
+  outline-offset: -1px;
+  border-color: #2f73c9;
+}
+
+.mock-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  border-radius: 4px;
+  color: #fff;
+  background: linear-gradient(180deg, #3577cf 0%, #2864ba 100%);
+  font-size: 13px;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+}
+
+.mock-btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.mock-btn-block {
+  width: 100%;
+  height: 38px;
 }
 
 .mock-scan-box {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 16px;
-  padding: 28px;
-  border-radius: 8px;
-  background: var(--slate-50);
-  border: 1px dashed var(--slate-200);
+  height: 250px;
+  border: 1px solid #dce1e6;
+  background: #fbfbfb;
+  border-radius: 3px;
+  padding-top: 24px;
+  text-align: center;
 }
 
 .mock-qr-placeholder {
-  width: 180px;
-  height: 180px;
-  border-radius: 6px;
-  background: var(--white);
-  border: 1px solid var(--slate-200);
+  width: 120px;
+  height: 120px;
+  margin: 0 auto;
+  border-radius: 4px;
+  background: #fff;
+  outline: 8px solid #fff;
+  box-shadow: 0 0 0 1px #d4dbe2;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: var(--slate-400);
+  color: #9aa6b4;
+}
+
+.mock-scan-box .mock-btn {
+  width: 191px;
+  height: 34px;
+  font-size: 12px;
+  margin-top: 16px;
 }
 
 .mock-divider {
   display: flex;
   align-items: center;
-  gap: 12px;
-  margin: 22px 0;
-  color: var(--slate-400);
+  gap: 13px;
+  margin: 17px 0;
+  color: #6b7280;
   font-size: 12px;
-  font-weight: 600;
+  font-weight: 700;
 }
 
 .mock-divider::before,
@@ -1041,81 +1113,156 @@ table.data-table td {
   content: "";
   flex: 1;
   height: 1px;
-  background: var(--slate-200);
+  background: #aab0b7;
 }
 
-.mock-banner {
+.mock-verify-submit {
+  display: flex;
+  justify-content: center;
+  margin-top: 8px;
+}
+
+.mock-verify-submit .mock-btn {
+  width: 152px;
+  height: 34px;
+  font-size: 12px;
+}
+
+/* --- Success banner (batch registered) --- */
+
+.mock-success {
+  border: 1px solid #bfdfc3;
+  background: #dff4df;
+  padding: 8px;
   text-align: center;
-  padding: 18px 16px;
-  border-radius: 8px;
-  margin-bottom: 22px;
+  font-size: 12px;
+  font-weight: 700;
+  color: #0a5f16;
+  border-radius: 3px;
 }
 
-.mock-banner-genuine {
-  background: var(--green-100);
+.mock-info {
+  margin-top: 7px;
+  border: 1px solid #d8dee4;
+  border-radius: 3px;
+  padding: 7px 14px;
+  font-size: 11px;
+  line-height: 1.6;
 }
 
-.mock-banner-genuine .mock-banner-title {
-  color: var(--green-700);
+.mock-inforow {
+  display: grid;
+  grid-template-columns: 150px 1fr;
 }
 
-.mock-banner-alert {
-  background: var(--red-100);
+.mock-divider-section {
+  margin-top: 9px;
+  border-top: 1px solid #bfc4ca;
+  padding-top: 8px;
 }
 
-.mock-banner-alert .mock-banner-title {
-  color: var(--red-700, #991b1b);
-}
-
-.mock-banner-neutral {
-  background: var(--slate-100);
-}
-
-.mock-banner-neutral .mock-banner-title {
-  color: var(--slate-700);
-}
-
-.mock-banner-title {
-  font-size: 20px;
-  font-weight: 800;
-  margin: 0 0 4px;
-  letter-spacing: 0.01em;
-}
-
-.mock-banner-subtitle {
-  font-size: 13.5px;
-  color: var(--slate-700);
+.mock-divider-section h3 {
+  font-size: 14px;
   margin: 0;
 }
 
-.mock-section-title {
-  font-size: 13.5px;
-  font-weight: 700;
-  margin: 24px 0 8px;
-  color: var(--slate-800);
+/* --- Result status box (verdict) --- */
+
+.mock-status {
+  border-radius: 4px;
+  text-align: center;
+  padding: 14px 18px 12px;
 }
 
-table.kv-table {
+.mock-status.tone-genuine {
+  border: 1px solid #bfdfc3;
+  background: #dff4df;
+}
+
+.mock-status.tone-genuine h2 {
+  color: #087219;
+}
+
+.mock-status.tone-alert {
+  border: 1px solid #f0c6c6;
+  background: #fbe0e0;
+}
+
+.mock-status.tone-alert h2 {
+  color: #ee2020;
+}
+
+.mock-status.tone-neutral {
+  border: 1px solid #d8dee4;
+  background: #f1f3f5;
+}
+
+.mock-status.tone-neutral h2 {
+  color: #475569;
+}
+
+.mock-status h2 {
+  margin: 0;
+  font-size: 20px;
+}
+
+.mock-status p {
+  font-size: 12px;
+  margin: 4px 0 0;
+}
+
+.mock-section-title {
+  margin: 18px 0 8px;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+/* --- Plain bordered key/value table (product details, hash comparison) --- */
+
+table.mock-kv {
   width: 100%;
   border-collapse: collapse;
-  font-size: 14px;
+  table-layout: fixed;
+  font-size: 12px;
 }
 
-table.kv-table td {
-  padding: 8px 0;
-  border-bottom: 1px solid var(--slate-100);
-  vertical-align: top;
+table.mock-kv td {
+  border: 1px solid #d1d6dc;
+  padding: 4px 10px;
 }
 
-table.kv-table td:first-child {
-  color: var(--slate-600);
-  width: 44%;
+table.mock-kv td:first-child {
+  width: 50%;
+  color: #475569;
 }
 
-table.kv-table td:last-child {
-  font-weight: 600;
-  text-align: right;
-  color: var(--slate-900);
+/* --- Header-row grid table (QR codes, supply chain integrity) --- */
+
+table.mock-grid {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+}
+
+table.mock-grid th,
+table.mock-grid td {
+  border: 1px solid #cfd5dc;
+  padding: 6px 8px;
+  text-align: left;
+}
+
+table.mock-grid th {
+  background: #f8f9fa;
+}
+
+.mock-red {
+  color: #f12323;
+  font-weight: 700;
+}
+
+.mock-green {
+  color: #0d871a;
+  font-weight: 700;
 }
 
 .mock-table-wrap {

@@ -3,13 +3,13 @@ import { AddressTag } from "./AddressHashTags";
 
 const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000";
 
-export function CustodyTimeline({ history }) {
+export function CustodyTimeline({ history, tableClassName = "data-table" }) {
   if (!history || history.length === 0) {
     return <div className="empty-state">No custody history.</div>;
   }
 
   return (
-    <table className="data-table">
+    <table className={tableClassName}>
       <thead>
         <tr>
           <th>#</th>

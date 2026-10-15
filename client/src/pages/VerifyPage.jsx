@@ -4,7 +4,6 @@ import { StatusBanner } from "../components/StatusBanner";
 import { CustodyTimeline } from "../components/CustodyTimeline";
 import { QrScanner } from "../components/QrScanner";
 import { HashTag, AddressTag } from "../components/AddressHashTags";
-import { Field } from "../components/Field";
 import { createReadOnlyClient } from "../lib/web3";
 import { computeVerdict, VERDICTS } from "../lib/verdict";
 import { offchainApi, tryFetch } from "../lib/offchainApi";
@@ -20,10 +19,10 @@ const ZERO_BYTES32 = "0x" + "0".repeat(64);
 // the off-chain service and acceptTransfer/dispense in the contract.
 const STAGE_SEQUENCE = ["Manufacturer", "Distributor", "Wholesaler", "Pharmacy", "Dispensed"];
 
-// Banner copy matching a plain "authentic / tampered / warning" product
-// mockup rather than the dashboard's small pill badges, since this page is
-// reached by anyone with a QR code, not just a signed-in participant.
-const BANNER_META = {
+// Banner copy matching the plain "authentic / tampered / warning" product
+// template rather than the dashboard's small pill badges, since this page
+// is reached by anyone with a QR code, not just a signed-in participant.
+const STATUS_META = {
   [VERDICTS.GENUINE]: { tone: "genuine", title: "AUTHENTIC MEDICINE", subtitle: "The record is valid and has not been altered." },
   [VERDICTS.ALREADY_DISPENSED]: { tone: "alert", title: "COUNTERFEIT WARNING", subtitle: "This unit was already dispensed elsewhere." },
   [VERDICTS.RECALLED]: { tone: "alert", title: "RECALLED - DO NOT USE", subtitle: "The regulator has recalled this batch." },
@@ -31,7 +30,7 @@ const BANNER_META = {
   [VERDICTS.FLAGGED]: { tone: "alert", title: "FLAGGED AS SUSPICIOUS", subtitle: "This unit was flagged as on-chain evidence of a counterfeit attempt." },
   [VERDICTS.NOT_FOUND]: { tone: "neutral", title: "NOT FOUND", subtitle: "No record exists on-chain for this product ID." },
 };
-const TAMPERED_BANNER = { tone: "alert", title: "TAMPERING DETECTED", subtitle: "The pharmaceutical information has been altered and does not match the blockchain record." };
+const TAMPERED_STATUS = { tone: "alert", title: "TAMPERING DETECTED", subtitle: "The pharmaceutical information has been altered and does not match the blockchain record." };
 
 export function VerifyPage() {
   const { unitId: unitIdParam } = useParams();
@@ -98,7 +97,7 @@ export function VerifyPage() {
   // A checkpoint hash mismatch is the strongest possible signal - the
   // off-chain record itself no longer matches what was anchored on-chain -
   // so it overrides whatever the custody-status verdict alone would say.
-  const banner = tampered ? TAMPERED_BANNER : baseVerdict ? BANNER_META[baseVerdict] : null;
+  const status = tampered ? TAMPERED_STATUS : baseVerdict ? STATUS_META[baseVerdict] : null;
 
   return (
     <div className="mock-shell">
@@ -109,45 +108,80 @@ export function VerifyPage() {
 
       <div className="mock-body">
         <div className="mock-card">
-          <div className="mock-card-title">Scan QR Code</div>
-          <div className="mock-scan-box">
-            <div className="mock-qr-placeholder" aria-hidden="true">
-              <QrGlyph />
+          <div className="mock-card-body">
+            <h2 className="mock-card-title">Scan QR Code</h2>
+            <div className="mock-scan-box">
+              <div className="mock-qr-placeholder" aria-hidden="true">
+                <QrGlyph />
+              </div>
+              <button type="button" className="mock-btn" onClick={() => setScanning((s) => !s)}>
+                {scanning ? "Cancel scan" : "Scan QR Code"}
+              </button>
             </div>
-            <button type="button" className="btn btn-primary btn-block" onClick={() => setScanning((s) => !s)}>
-              {scanning ? "Cancel scan" : "Scan QR Code"}
-            </button>
+
+            <div className="mock-divider">OR</div>
+
+            <h3 style={{ fontSize: 14, margin: "0 0 8px" }}>Enter Serial Number</h3>
+            <form onSubmit={handleSubmit}>
+              <input
+                style={{ height: 32, width: "100%", border: "1px solid #c8d5e4", borderRadius: 4, padding: "0 13px", fontSize: 12, fontFamily: "inherit" }}
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+                placeholder="0x..."
+              />
+              <div className="mock-verify-submit">
+                <button className="mock-btn" disabled={loading}>
+                  {loading ? "Checking..." : "Verify"}
+                </button>
+              </div>
+            </form>
           </div>
-
-          <div className="mock-divider">OR</div>
-
-          <form onSubmit={handleSubmit}>
-            <Field label="Enter Serial Number">
-              <input value={input} onChange={(e) => setInput(e.target.value)} placeholder="0x..." />
-            </Field>
-            <button className="btn btn-primary btn-block" disabled={loading}>
-              {loading ? "Checking..." : "Verify"}
-            </button>
-          </form>
         </div>
 
         {scanning && <QrScanner onDecode={handleScan} onClose={() => setScanning(false)} />}
 
         {loadError && (
           <div className="mock-card">
-            <StatusBanner tone="error">{loadError}</StatusBanner>
+            <div className="mock-card-body">
+              <StatusBanner tone="error">{loadError}</StatusBanner>
+            </div>
           </div>
         )}
 
-        {result && banner && (
+        {result && status && (
           <div className="mock-card">
-            <div className={`mock-banner mock-banner-${banner.tone}`}>
-              <p className="mock-banner-title">{banner.title}</p>
-              <p className="mock-banner-subtitle">{banner.subtitle}</p>
+            <div className={`mock-status tone-${status.tone}`}>
+              <h2>{status.title}</h2>
+              <p>{status.subtitle}</p>
             </div>
 
+            {result.verify.exists && result.supplyChain && result.supplyChain.rows[0] && result.supplyChain.rows[0].snapshot && (
+              <table className="mock-kv" style={{ width: "calc(100% - 40px)", margin: "0 20px" }}>
+                <tbody>
+                  <tr>
+                    <td>Product Name</td>
+                    <td>{result.supplyChain.rows[0].snapshot.productName}</td>
+                  </tr>
+                  <tr>
+                    <td>Active Ingredient</td>
+                    <td>{result.supplyChain.rows[0].snapshot.activeIngredient}</td>
+                  </tr>
+                  <tr>
+                    <td>Dosage Form</td>
+                    <td>{result.supplyChain.rows[0].snapshot.dosageForm}</td>
+                  </tr>
+                  {result.supplyChain.rows[0].snapshot.strength && (
+                    <tr>
+                      <td>Strength</td>
+                      <td>{result.supplyChain.rows[0].snapshot.strength}</td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            )}
+
             {result.verify.exists && (
-              <table className="kv-table">
+              <table className="mock-kv" style={{ width: "calc(100% - 40px)", margin: "12px 20px 0" }}>
                 <tbody>
                   <tr>
                     <td>Product ID</td>
@@ -179,16 +213,22 @@ export function VerifyPage() {
 
             {result.verify.exists && result.supplyChain && (
               <>
-                <div className="mock-section-title">Supply Chain Integrity</div>
-                <SupplyChainIntegrity supplyChain={result.supplyChain} />
+                <h3 className="mock-section-title" style={{ margin: "18px 20px 8px" }}>
+                  Supply Chain Integrity
+                </h3>
+                <div style={{ padding: "0 20px" }}>
+                  <SupplyChainIntegrity supplyChain={result.supplyChain} />
+                </div>
               </>
             )}
 
             {result.verify.exists && (
               <>
-                <div className="mock-section-title">Custody Timeline</div>
-                <div className="mock-table-wrap">
-                  <CustodyTimeline history={result.history} />
+                <h3 className="mock-section-title" style={{ margin: "18px 20px 8px" }}>
+                  Custody Timeline
+                </h3>
+                <div className="mock-table-wrap" style={{ padding: "0 20px 20px" }}>
+                  <CustodyTimeline history={result.history} tableClassName="mock-grid" />
                 </div>
               </>
             )}
@@ -201,9 +241,9 @@ export function VerifyPage() {
 
 function QrGlyph() {
   // A plain decorative QR-pattern glyph for the scan placeholder - not a
-  // real code, just a visual stand-in matching a product mockup's framing.
+  // real code, just a visual stand-in matching the product template.
   return (
-    <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6">
+    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6">
       <rect x="3" y="3" width="7" height="7" rx="1" />
       <rect x="14" y="3" width="7" height="7" rx="1" />
       <rect x="3" y="14" width="7" height="7" rx="1" />
@@ -245,6 +285,7 @@ async function checkSupplyChainIntegrity(unitId, history) {
       sqlHash,
       blockchainHash: onchain.recordHash,
       timestamp: Number(onchain.timestamp),
+      snapshot: offchain.snapshot,
     };
   });
 
@@ -271,7 +312,7 @@ function SupplyChainIntegrity({ supplyChain }) {
         </StatusBanner>
       )}
       <div className="mock-table-wrap">
-        <table className="data-table">
+        <table className="mock-grid">
           <thead>
             <tr>
               <th>Stage</th>
@@ -319,14 +360,12 @@ function StageRow({ row, auditLog }) {
         <td>
           <HashTag hash={row.blockchainHash} />
         </td>
-        <td style={{ color: row.status === "verified" ? "#15803d" : "#dc2626", fontWeight: 600 }}>
-          {row.status === "verified" ? "Verified" : "Tampered"}
-        </td>
+        <td className={row.status === "verified" ? "mock-green" : "mock-red"}>{row.status === "verified" ? "Verified" : "Tampered"}</td>
       </tr>
       {change && (
         <tr>
           <td></td>
-          <td colSpan={4} style={{ color: "#dc2626" }}>
+          <td colSpan={4} className="mock-red">
             Affected field: <strong>{change.field}</strong> (was {JSON.stringify(change.oldValue)}, now {JSON.stringify(change.newValue)})
           </td>
         </tr>

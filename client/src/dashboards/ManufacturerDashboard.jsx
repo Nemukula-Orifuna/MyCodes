@@ -7,7 +7,6 @@ import { useTransaction } from "../hooks/useTransaction";
 import { PageHeader } from "../components/Layout";
 import { StatusBanner } from "../components/StatusBanner";
 import { QrCode } from "../components/QrCode";
-import { Field } from "../components/Field";
 import { StatCard, StatGrid } from "../components/StatCard";
 import { PackageIcon, ShieldCheckIcon, TruckIcon } from "../components/Icon";
 import { OutgoingCard } from "./TransferDashboard";
@@ -30,6 +29,7 @@ export function ManufacturerDashboard() {
     productName: "",
     activeIngredient: "",
     dosageForm: "",
+    strength: "",
     manufactureDate: "",
     expiryDate: "",
     unitCount: 10,
@@ -49,7 +49,12 @@ export function ManufacturerDashboard() {
     const manufactureDate = toUnixSeconds(form.manufactureDate);
     const expiryDate = toUnixSeconds(form.expiryDate);
 
-    const details = { productName: form.productName, activeIngredient: form.activeIngredient, dosageForm: form.dosageForm };
+    const details = {
+      productName: form.productName,
+      activeIngredient: form.activeIngredient,
+      dosageForm: form.dosageForm,
+      strength: form.strength,
+    };
 
     const result = await run(async () => {
       const offchainRecord = await offchainApi.createBatch(batchId, details);
@@ -72,6 +77,7 @@ export function ManufacturerDashboard() {
         batchReference: form.batchReference,
         productName: form.productName,
         dosageForm: form.dosageForm,
+        strength: form.strength,
         manufactureDate: form.manufactureDate,
         expiryDate: form.expiryDate,
         units,
@@ -91,107 +97,126 @@ export function ManufacturerDashboard() {
         <StatCard icon={<TruckIcon />} value={holding.length} label="Units currently held" />
       </StatGrid>
 
-      <div className="card">
-        <div className="card-title">Register a batch</div>
-        <form onSubmit={handleSubmit}>
-          <div className="grid-2">
-            <Field label="Batch reference">
-              <input value={form.batchReference} onChange={(e) => update("batchReference", e.target.value)} placeholder="BATCH-2026-001" required />
-            </Field>
-            <Field label={`Units in this batch (max ${MAX_UNITS})`}>
-              <input type="number" min={1} max={MAX_UNITS} value={form.unitCount} onChange={(e) => update("unitCount", e.target.value)} required />
-            </Field>
-            <Field label="Product name">
-              <input value={form.productName} onChange={(e) => update("productName", e.target.value)} required />
-            </Field>
-            <Field label="Active ingredient">
-              <input value={form.activeIngredient} onChange={(e) => update("activeIngredient", e.target.value)} required />
-            </Field>
-            <Field label="Dosage form">
-              <input value={form.dosageForm} onChange={(e) => update("dosageForm", e.target.value)} placeholder="capsule, tablet, ..." required />
-            </Field>
-            <Field label="Manufacture date">
-              <input type="date" value={form.manufactureDate} onChange={(e) => update("manufactureDate", e.target.value)} required />
-            </Field>
-            <Field label="Expiry date">
-              <input type="date" value={form.expiryDate} onChange={(e) => update("expiryDate", e.target.value)} required />
-            </Field>
+      <div className="mock-card" style={{ fontFamily: "Arial, Helvetica, sans-serif" }}>
+        <div className="mock-card-body">
+          <h2 className="mock-card-title">Register New Medicine Batch</h2>
+          <div className="mock-field-card">
+            <form onSubmit={handleSubmit}>
+              <label className="mock-field-row">
+                <span>Product Name</span>
+                <input value={form.productName} onChange={(e) => update("productName", e.target.value)} required />
+              </label>
+              <label className="mock-field-row">
+                <span>Active Ingredient</span>
+                <input value={form.activeIngredient} onChange={(e) => update("activeIngredient", e.target.value)} required />
+              </label>
+              <label className="mock-field-row">
+                <span>Dosage Form</span>
+                <input value={form.dosageForm} onChange={(e) => update("dosageForm", e.target.value)} placeholder="capsule, tablet, ..." required />
+              </label>
+              <label className="mock-field-row">
+                <span>Strength</span>
+                <input value={form.strength} onChange={(e) => update("strength", e.target.value)} placeholder="500mg" required />
+              </label>
+              <label className="mock-field-row">
+                <span>Batch Number</span>
+                <input value={form.batchReference} onChange={(e) => update("batchReference", e.target.value)} placeholder="BATCH-2026-001" required />
+              </label>
+              <label className="mock-field-row">
+                <span>Manufacture Date</span>
+                <input type="date" value={form.manufactureDate} onChange={(e) => update("manufactureDate", e.target.value)} required />
+              </label>
+              <label className="mock-field-row">
+                <span>Expiry Date</span>
+                <input type="date" value={form.expiryDate} onChange={(e) => update("expiryDate", e.target.value)} required />
+              </label>
+              <label className="mock-field-row">
+                <span>{`Quantity (Units, max ${MAX_UNITS})`}</span>
+                <input type="number" min={1} max={MAX_UNITS} value={form.unitCount} onChange={(e) => update("unitCount", e.target.value)} required />
+              </label>
+              {error && <StatusBanner tone="error">{error}</StatusBanner>}
+              <div style={{ display: "flex", justifyContent: "center", marginTop: 8 }}>
+                <button className="mock-btn" style={{ width: 240, height: 40 }} disabled={status === "pending"}>
+                  {status === "pending" ? "Registering batch..." : "Register Batch"}
+                </button>
+              </div>
+            </form>
           </div>
-          {error && <StatusBanner tone="error">{error}</StatusBanner>}
-          <button className="btn btn-primary" disabled={status === "pending"}>
-            {status === "pending" ? "Registering batch..." : "Register batch"}
-          </button>
-        </form>
+        </div>
       </div>
 
       {generatedUnits && (
-        <div className="mock-card">
-          <div className="card-title">
-            Batch Registered
-            <button className="btn btn-secondary no-print" onClick={() => window.print()}>
-              Print
-            </button>
-          </div>
-          <div className="mock-banner mock-banner-genuine">
-            <p className="mock-banner-title">Batch registered successfully!</p>
-          </div>
-          <table className="kv-table">
-            <tbody>
-              <tr>
-                <td>Product Name</td>
-                <td>{generatedUnits.productName}</td>
-              </tr>
-              <tr>
-                <td>Dosage Form</td>
-                <td>{generatedUnits.dosageForm}</td>
-              </tr>
-              <tr>
-                <td>Batch Number</td>
-                <td>{generatedUnits.batchReference}</td>
-              </tr>
-              <tr>
-                <td>Manufacture Date</td>
-                <td>{generatedUnits.manufactureDate}</td>
-              </tr>
-              <tr>
-                <td>Expiry Date</td>
-                <td>{generatedUnits.expiryDate}</td>
-              </tr>
-              <tr>
-                <td>Quantity</td>
-                <td>{generatedUnits.units.length} units</td>
-              </tr>
-            </tbody>
-          </table>
+        <div className="mock-card" style={{ fontFamily: "Arial, Helvetica, sans-serif" }}>
+          <div className="mock-card-body">
+            <div className="card-title" style={{ marginBottom: 12 }}>
+              Batch Registered
+              <button className="btn btn-secondary no-print" onClick={() => window.print()}>
+                Print
+              </button>
+            </div>
+            <div className="mock-success">Batch registered successfully!</div>
+            <div className="mock-info">
+              <div className="mock-inforow">
+                <span>Product Name:</span>
+                <span>{generatedUnits.productName}</span>
+              </div>
+              <div className="mock-inforow">
+                <span>Dosage Form:</span>
+                <span>{generatedUnits.dosageForm}</span>
+              </div>
+              <div className="mock-inforow">
+                <span>Strength:</span>
+                <span>{generatedUnits.strength}</span>
+              </div>
+              <div className="mock-inforow">
+                <span>Batch Number:</span>
+                <span>{generatedUnits.batchReference}</span>
+              </div>
+              <div className="mock-inforow">
+                <span>Manufacture Date:</span>
+                <span>{generatedUnits.manufactureDate}</span>
+              </div>
+              <div className="mock-inforow">
+                <span>Expiry Date:</span>
+                <span>{generatedUnits.expiryDate}</span>
+              </div>
+              <div className="mock-inforow">
+                <span>Quantity:</span>
+                <span>{generatedUnits.units.length} units</span>
+              </div>
+            </div>
 
-          <div className="mock-section-title">Generated QR Codes</div>
-          <div className="mock-table-wrap">
-            <table className="data-table">
-              <thead>
-                <tr>
-                  <th>#</th>
-                  <th>Serial Number</th>
-                  <th>QR Code</th>
-                  <th></th>
-                </tr>
-              </thead>
-              <tbody>
-                {generatedUnits.units.map((u, i) => (
-                  <tr key={u.unitId}>
-                    <td>{i + 1}</td>
-                    <td className="mono">
-                      {generatedUnits.batchReference}-{String(u.serial).padStart(4, "0")}
-                    </td>
-                    <td>
-                      <QrCode value={u.unitId} size={44} />
-                    </td>
-                    <td>
-                      <DownloadQrButton value={u.unitId} filename={`${generatedUnits.batchReference}-${u.serial}.png`} />
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+            <div className="mock-divider-section">
+              <h3>Generated QR Codes</h3>
+              <div className="mock-table-wrap">
+                <table className="mock-grid">
+                  <thead>
+                    <tr>
+                      <th>#</th>
+                      <th>Serial Number</th>
+                      <th>QR Code</th>
+                      <th></th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {generatedUnits.units.map((u, i) => (
+                      <tr key={u.unitId}>
+                        <td style={{ textAlign: "center" }}>{i + 1}</td>
+                        <td className="mono">
+                          {generatedUnits.batchReference}-{String(u.serial).padStart(4, "0")}
+                        </td>
+                        <td style={{ textAlign: "center" }}>
+                          <QrCode value={u.unitId} size={44} />
+                        </td>
+                        <td>
+                          <DownloadQrButton value={u.unitId} filename={`${generatedUnits.batchReference}-${u.serial}.png`} />
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
           </div>
         </div>
       )}
@@ -211,7 +236,7 @@ function DownloadQrButton({ value, filename }) {
   }
 
   return (
-    <button type="button" className="btn btn-primary no-print" onClick={handleDownload}>
+    <button type="button" className="mock-btn no-print" style={{ width: 80, height: 30, fontSize: 12 }} onClick={handleDownload}>
       Download
     </button>
   );
