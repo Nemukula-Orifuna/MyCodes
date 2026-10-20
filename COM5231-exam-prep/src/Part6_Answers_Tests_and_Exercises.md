@@ -113,6 +113,7 @@ These are needed because Shannon limits the bps/Hz achievable for a given SNR [W
 **OFDMA (4 marks)**: a **multiple access scheme built on OFDM**: a combination of **FDMA and TDMA**, where **different users are assigned subsets of the subcarriers (subchannels / LTE resource blocks of 12 subcarriers) at different times**. Subchannels can be formed from **adjacent, regularly spaced or randomly spaced** subcarriers, and are allocated by **opportunistic scheduling** (efficiency, proportional fairness rᵢ/r̄ᵢ, requirements, priority). In the uplink, a user **concentrates power** on its own subchannels, saving battery [OF §8.2; AT].
 
 **Key differences (2 marks)**:
+
 | | OFDM | OFDMA |
 |---|---|---|
 | Type | Modulation / transmission technique | Multiple access technique |

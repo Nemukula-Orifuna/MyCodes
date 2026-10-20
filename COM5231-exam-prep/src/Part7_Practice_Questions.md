@@ -78,6 +78,7 @@ OFDM divides the data into **N parallel substreams**, so each subcarrier's **sym
 ## SECTION C — Comparison questions
 
 **C1. Compare FDMA and TDMA under: principle, synchronisation, efficiency, battery life, equalization. (10)**
+
 | | FDMA | TDMA |
 |---|---|---|
 | Principle | Spectrum divided into **frequency bands with guard bands**; one user per channel **100% of the time** | Same frequency shared by dividing **time into slots**; users transmit in **bursts** |
@@ -90,6 +91,7 @@ OFDM divides the data into **N parallel substreams**, so each subcarrier's **sym
 [MA p3–7]
 
 **C2. Compare ZigBee coordinator, router and end device. (6)**
+
 | Device | Role | Notes |
 |---|---|---|
 | **Coordinator** | Most capable; **only one per network**; **starts the network**, is the root of a tree, **maintains network information such as security keys** | Usually mains powered |
@@ -98,6 +100,7 @@ OFDM divides the data into **N parallel substreams**, so each subcarrier's **sym
 [BT-S 85–86]
 
 **C3. Compare SCO and ACL links. (6)**
+
 | | SCO | ACL |
 |---|---|---|
 | Topology | Point-to-point (master ↔ one slave) | **Point-to-multipoint** (master ↔ all slaves) |
@@ -118,6 +121,7 @@ OFDM divides the data into **N parallel substreams**, so each subcarrier's **sym
 **D1. Hamming code. Encode the data byte 10110011 using an even-parity Hamming code (positions numbered from 1 at the left, check bits at 1, 2, 4, 8). (a) How many check bits? (b) Calculate each check bit. (c) Write the codeword. (8)**
 **(a)** 2^r ≥ m + r + 1 with m = 8: r = 3 gives 8 < 12 ✘; r = 4 gives 16 ≥ 13 ✔ → **4 check bits** (12-bit codeword).
 **(b)**
+
 | Pos | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|
 | | P1 | P2 | 1 | P4 | 0 | 1 | 1 | P8 | 0 | 0 | 1 | 1 |
@@ -155,6 +159,7 @@ Append 000 → 100100000.
 **Remainder = 001** → transmit **100100001**.
 
 **D5. Internet checksum (4-bit words). Message 0110 1011 1001 0101. Find the checksum and show the receiver's check. (4)**
+
 | Step | Addition | Raw | After end-around carry |
 |---|---|---|---|
 | 1 | 0110 + 1011 | 1 0001 | 0001 + 1 = **0010** |

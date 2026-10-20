@@ -103,6 +103,7 @@ From the notes [FZ characteristics; WL 3–4; WL 16, 29; WCP]:
 - A mobile station **can belong to more than one BSS** at the same time [FZ].
 
 **Station types by mobility** [FZ]:
+
 | Type | Meaning |
 |---|---|
 | **No-transition** | Stationary, or moving only inside one BSS |
@@ -196,6 +197,7 @@ Using the exam's **Figure 2**: three nodes **A, B, C** in a row. Each circle is 
 ## 9.11 ★ CSMA/CA and DCF: the complete procedure [WL 32–35, FZ]
 
 **Interframe spaces** [WL 34]. A shorter IFS means **higher priority**:
+
 | IFS | Length | Used for |
 |---|---|---|
 | **SIFS** (short IFS) | **Shortest** (highest priority) | **Immediate responses**: ACK after data, CTS after RTS, data after CTS |
@@ -324,6 +326,7 @@ The standards (2500+ pages) have two groups:
 ```
 
 **Core protocols (five-layer stack)**:
+
 | Layer | Role |
 |---|---|
 | **Radio** | Air interface: **frequency, frequency hopping, modulation, transmit power** |
@@ -430,11 +433,13 @@ Only **8 can be active** (1 master + 7 active slaves): the active-member address
 ## 10.10 Packet format [BT-B, BT-S 36–44]
 
 ```
+
 |<--- 72 bits --->|<- 54 bits ->|<----- 0 to 2745 bits ----->|
 |  Access code    |   Header    |          Payload           |
 
 Access code: | preamble 4 | SYNC word 64 | trailer 4 |
 Header (18 bits, sent with 1/3 FEC = 54):
+
 | AM_ADDR 3 | Type 4 | Flow 1 | ARQN 1 | SEQN 1 | HEC 8 |
 ```
 - **Access code**: timing synchronisation, offset compensation, paging, inquiry. Types: **CAC** (channel access code: identifies a piconet), **DAC** (device access code: paging and responses), **IAC** (inquiry access code: inquiry).
@@ -639,6 +644,7 @@ Loop (until N' = all nodes):
 - Step 5: add **z (8)**.
 
 **Result (least-cost paths from x)**:
+
 | Destination | Cost | Path | First hop (forwarding table) |
 |---|---|---|---|
 | v | 3 | x → v | v |
@@ -729,6 +735,7 @@ Loop (until N' = all nodes):
 - Step 6 (via C = 9): D: 9 + 3 = 12 > 10, keep. Pick **D (10)**.
 
 **(b) Final costs and routes from A**:
+
 | Destination | Cost | Complete shortest route |
 |---|---|---|
 | **B** | **2** | A → B |

@@ -777,6 +777,7 @@ output |▒▒▒▒▒▒▒▒| all scaled     output |▓▓▓  ▓▓▓| p
 ## 2.15 Examination focus — Topic 2
 
 **Real past-paper questions from this topic**
+
 | Question | Paper(s) | Marks |
 |---|---|---|
 | Explain the three basic propagation mechanisms in a mobile communication system | T1A Q1, T1B Q3 | 12, 12 |

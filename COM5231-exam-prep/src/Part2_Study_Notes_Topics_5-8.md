@@ -261,6 +261,7 @@ SUPPLEMENTARY: this resistance is measured by the **processing gain** Gp = Bss/B
 - In practice more than one transmitter may fall inside a beam, so **SDMA is combined with other multiple access techniques** [MX].
 
 **Why SDMA was developed: omnidirectional vs adaptive antennas** [MA p9–10]
+
 | Omnidirectional (traditional) | Adaptive antenna / SDMA |
 |---|---|
 | Base station has **no information on the mobile's position**; radiates in **all directions** | Uses **adaptive antenna arrays (smart antennas)** to send/receive **only within a limited angular range**, following the directional nature of multipath |
@@ -442,6 +443,7 @@ original ──► [Modulator] ──► spread signal
 - If the original rate is N, the spread rate is **11N**, so the spread signal needs **11 times the bandwidth**.
 
 **Worked example DS1: spreading data 1 0 1 with the Barker code**
+
 | Data bit | Chips sent (11 chips per bit) |
 |---|---|
 | 1 | 1 0 1 1 0 1 1 1 0 0 0 (code as is) |
@@ -758,6 +760,7 @@ Check bit P at position 2^k covers every position whose **binary number has that
 **Check bits needed**: m = 8 → **r = 4** (inequality above).
 
 **Placement:**
+
 | Position | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|
 | Type | P1 | P2 | D | P4 | D | D | D | P8 | D | D | D | D |
@@ -770,6 +773,7 @@ Check bit P at position 2^k covers every position whose **binary number has that
 - **P8** = bits at 9, 10, 11, 12 = 1, 1, 1, 1 → four 1s → **P8 = 0**
 
 **Codeword:**
+
 | Position | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|
 | Bit | **1** | **0** | 1 | **0** | 0 | 1 | 0 | **0** | 1 | 1 | 1 | 1 |
@@ -782,6 +786,7 @@ Check bit P at position 2^k covers every position whose **binary number has that
 **(a) Minimum check bits.** Inequality **2^r ≥ m + r + 1** with m = 8. r = 3: 8 ≥ 12 ✘. r = 4: 16 ≥ 13 ✔. **r = 4.** Verify: 2⁴ = 16 ≥ 13 ✔ while 2³ = 8 < 12.
 
 **(b) Placement and check bits:**
+
 | Position | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|
 | Type | P1 | P2 | D | P4 | D | D | D | P8 | D | D | D | D |
@@ -793,6 +798,7 @@ Check bit P at position 2^k covers every position whose **binary number has that
 - **P8** covers 8, 9, 10, 11, 12 → data 1, 0, 1, 0 = two 1s → **P8 = 0**
 
 **(c) Complete codeword (positions 1 → 12):**
+
 | Position | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|
 | Bit | **0** | **0** | 1 | **1** | 1 | 0 | 0 | **0** | 1 | 0 | 1 | 0 |
@@ -945,6 +951,7 @@ Polynomial view: M(x) = x⁷ + x⁴ + x³ + x; x³M(x) = x¹⁰ + x⁷ + x⁶ + 
 
 ### Worked examples CR5 (worksheet Kurose problems [ED], verified)
 *G = 10011 (r = 4).*
+
 | D | Remainder R | Transmitted D·R |
 |---|---|---|
 | **1010101010** | **0100** | 1010101010 0100 |

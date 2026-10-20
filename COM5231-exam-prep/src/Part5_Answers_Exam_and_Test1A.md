@@ -125,6 +125,7 @@ One's-complement addition with end-around carry:
 **Similarities**: both compute **least-cost paths** over a graph of link costs, build a **forwarding table**, and adapt dynamically to cost changes.
 
 **Differences**:
+
 | | **Link-state** | **Distance-vector** |
 |---|---|---|
 | Knowledge | **Global**: complete topology at every router | **Local**: only neighbours' distance estimates |

@@ -57,10 +57,10 @@ def tag_h1(m):
     return f'<h1 id="sec-{n}" class="pb">{title_html}</h1>'
 body = re.sub(r"<h1([^>]*)>(.*?)</h1>", tag_h1, body, flags=re.S)
 toc_html = ""
-if len(inputs) > 1:
+if len(inputs) > 1 or os.environ.get("TOC"):
     items = []
     for n, t in enumerate(toc):
-        cls = "toc-part" if re.match(r"(Part|Overview)", t) else "toc-topic"
+        cls = "toc-part" if re.match(r"(Part|Overview|How|\d+\.)", t) else "toc-topic"
         items.append(f'<li class="{cls}"><a href="#sec-{n}">{html.escape(t)}</a></li>')
     toc_html = '<div class="toc"><h1 class="toch">Contents</h1><ul>' + "".join(items) + "</ul></div>"
 
