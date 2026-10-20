@@ -10,6 +10,8 @@ const { chromium } = require('/opt/node22/lib/node_modules/playwright');
     path: output,
     format: 'A4',
     printBackground: true,
+    outline: true,
+    tagged: true,
     margin: { top: '18mm', bottom: '18mm', left: '16mm', right: '16mm' },
     displayHeaderFooter: true,
     headerTemplate: `<div style="font-size:7.5px;color:#888;width:100%;padding:0 16mm;font-family:Inter,sans-serif;">COM5231 · ${title}</div>`,

@@ -44,7 +44,7 @@ No memorandums were provided, so all answers are model answers, not the lecturer
 
 ## B. Coverage gap: routing
 
-About **30% of past-paper marks** are on routing: Dijkstra, Bellman-Ford, link-state vs distance-vector, count-to-infinity, MANET routing categories, and routing vs forwarding vs switching. **No uploaded notes cover this.** The course outline lists Ch. 3, Ch. 4, Ch. 10 and Ch. 13 (Agrawal, Ad hoc Networks), none of which were provided.
+Routing is **30% of the exam paper's marks** and **25–32% of the Test 2 papers** (about 16% of all 450 past-paper marks, since the Test 1 papers don't cover it). The topics are Dijkstra, Bellman-Ford, link-state vs distance-vector, count-to-infinity, MANET routing categories, and routing vs forwarding vs switching. **No uploaded notes cover these.** The course outline lists Ch. 3, Ch. 4, Ch. 10 and Ch. 13 (Agrawal, Ad hoc Networks), none of which were provided.
 
 | Paper | Routing questions | Marks |
 |---|---|---|
@@ -87,7 +87,7 @@ These answers will be clearly labelled **SUPPLEMENTARY** and based on standard s
 
 | Part | Content |
 |---|---|
-| **Part 1** | Study notes: Topics 1–4 (this document) |
+| **Part 1** | Study notes: Topics 1–4 |
 | **Part 2** | Study notes: Topics 5–8 |
 | **Part 3** | Study notes: Topics 9–11 |
 | **Part 4** | Examination pattern analysis |

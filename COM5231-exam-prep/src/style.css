@@ -38,3 +38,11 @@ hr { border: none; border-top: 1px solid #ccd; margin: 16px 0; }
 .cfoot { margin-top: 40px; color: #7a8796; font-size: 9pt; }
 section.doc > h1:first-child { page-break-before: always; }
 section.doc:first-of-type > h1:first-child { page-break-before: avoid; }
+.toc { page-break-after: always; }
+.toc h1.toch { page-break-before: avoid; }
+.toc ul { list-style: none; padding: 0; margin: 0; }
+.toc li { margin: 0; }
+.toc li.toc-part { margin-top: 10px; font-weight: 700; font-size: 11pt; }
+.toc li.toc-topic { padding-left: 18px; font-size: 10pt; }
+.toc a { color: #12355b; text-decoration: none; }
+th strong, th em, th a { color: #fff; }

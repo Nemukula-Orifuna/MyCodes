@@ -48,8 +48,21 @@ def convert_pre(m):
 body = re.sub(r"<pre[^>]*><code[^>]*>(.*?)</code></pre>", convert_pre, body, flags=re.S)
 # inline code (rare) -> plain emphasis, so nothing looks like programming code
 body = re.sub(r"<code>(.*?)</code>", r'<span class="mono">\1</span>', body, flags=re.S)
-# each top-level "# TOPIC" heading starts a new page
-body = re.sub(r"<h1([^>]*)>", r'<h1\1 class="pb">', body)
+# each top-level "# TOPIC" heading starts a new page; give h1s stable ids for the contents page
+toc = []
+def tag_h1(m):
+    n = len(toc)
+    title_html = m.group(2)
+    toc.append(re.sub(r"<[^>]+>", "", title_html))
+    return f'<h1 id="sec-{n}" class="pb">{title_html}</h1>'
+body = re.sub(r"<h1([^>]*)>(.*?)</h1>", tag_h1, body, flags=re.S)
+toc_html = ""
+if len(inputs) > 1:
+    items = []
+    for n, t in enumerate(toc):
+        cls = "toc-part" if re.match(r"(Part|Overview)", t) else "toc-topic"
+        items.append(f'<li class="{cls}"><a href="#sec-{n}">{html.escape(t)}</a></li>')
+    toc_html = '<div class="toc"><h1 class="toch">Contents</h1><ul>' + "".join(items) + "</ul></div>"
 
 css = open(os.path.join(here, "style.css"), encoding="utf-8").read()
 doc = f"""<!doctype html><html><head><meta charset="utf-8"><title>{html.escape(title)}</title>
@@ -66,6 +79,7 @@ doc = f"""<!doctype html><html><head><meta charset="utf-8"><title>{html.escape(t
   </div>
   <div class="cfoot">Exam preparation pack, built from the uploaded lecture materials and past papers</div>
 </div>
+{toc_html}
 {body}
 </body></html>"""
 tmp_html = out_pdf[:-4] + ".tmp.html"
