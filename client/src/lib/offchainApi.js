@@ -27,6 +27,7 @@ export const offchainApi = {
   getCheckpoints: (unitId) => request(`/api/checkpoints/${unitId}`),
   tamperCheckpoint: (checkpointId, field, value) =>
     request(`/api/checkpoints/${checkpointId}/tamper`, { method: "PATCH", body: JSON.stringify({ field, value }) }),
+  login: (username, password) => request("/api/auth/login", { method: "POST", body: JSON.stringify({ username, password }) }),
 };
 
 /// Fetches a resource and returns { data, error } instead of throwing, for

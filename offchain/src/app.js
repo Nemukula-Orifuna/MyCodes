@@ -4,6 +4,7 @@ const participantsRouter = require("./routes/participants");
 const batchesRouter = require("./routes/batches");
 const prescriptionsRouter = require("./routes/prescriptions");
 const checkpointsRouter = require("./routes/checkpoints");
+const authRouter = require("./routes/auth");
 
 /// Builds the Express app against the given SQLite db path (or ":memory:"
 /// for tests). This service never talks to the blockchain - it only stores
@@ -33,6 +34,7 @@ function createApp(dbPath) {
   app.use("/api/batches", batchesRouter(db));
   app.use("/api/prescriptions", prescriptionsRouter(db));
   app.use("/api/checkpoints", checkpointsRouter(db));
+  app.use("/api/auth", authRouter());
 
   app.use((req, res) => res.status(404).json({ error: "not found" }));
   // eslint-disable-next-line no-unused-vars

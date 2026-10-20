@@ -1,10 +1,16 @@
 import { useWeb3 } from "../context/Web3Context";
 import { ROLE_NAMES } from "../lib/constants";
 import { SearchIcon, BellIcon } from "./Icon";
+import { logout } from "../lib/auth";
 
 export function TopBar() {
   const { hasMetaMask, account, isWrongNetwork, chainId, expectedChainId, role, isRegisteredAndActive, participantLoading } =
     useWeb3();
+
+  function handleLogout() {
+    logout();
+    window.location.assign("/");
+  }
 
   return (
     <header className="topbar">
@@ -21,6 +27,10 @@ export function TopBar() {
 
         <button type="button" className="icon-btn" aria-label="Notifications">
           <BellIcon width={17} height={17} />
+        </button>
+
+        <button type="button" className="btn btn-secondary" onClick={handleLogout}>
+          Log out
         </button>
 
         {hasMetaMask && account && (
