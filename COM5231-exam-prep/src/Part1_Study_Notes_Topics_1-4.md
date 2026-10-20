@@ -1,5 +1,4 @@
-# COM5231 Introduction to Wireless and Ad Hoc Networking
-# PART 1 — Detailed Study Notes: Topics 1–4
+# Part 1 — Detailed Study Notes: Topics 1–4
 
 **Topics in this part**
 1. Transmission Fundamentals
