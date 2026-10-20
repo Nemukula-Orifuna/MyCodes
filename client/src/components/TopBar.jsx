@@ -1,6 +1,6 @@
+import { NavLink } from "react-router-dom";
 import { useWeb3 } from "../context/Web3Context";
 import { ROLE_NAMES } from "../lib/constants";
-import { SearchIcon, BellIcon } from "./Icon";
 import { logout } from "../lib/auth";
 
 export function TopBar() {
@@ -13,39 +13,39 @@ export function TopBar() {
   }
 
   return (
-    <header className="topbar">
-      <div className="topbar-search">
-        <SearchIcon width={16} height={16} />
-        <span>Search participants, batches, serial numbers&hellip;</span>
+    <header className="app-header">
+      <div className="app-header-left">
+        <span className="app-header-brand">PharmaTrace</span>
+        <nav className="app-header-nav">
+          <NavLink to="/" end className={({ isActive }) => `app-header-link${isActive ? " active" : ""}`}>
+            Dashboard
+          </NavLink>
+          <NavLink to="/verify" className={({ isActive }) => `app-header-link${isActive ? " active" : ""}`}>
+            Verify a product
+          </NavLink>
+        </nav>
       </div>
 
-      <div className="topbar-right">
-        <span className="network-badge">
-          <span className="dot" style={isWrongNetwork ? { background: "var(--red-600)" } : undefined} />
+      <div className="app-header-right">
+        <span className="app-header-network">
+          <span className="dot" style={isWrongNetwork ? { background: "#f0c6c6" } : undefined} />
           {isWrongNetwork ? `Chain ${chainId ?? "?"} (expected ${expectedChainId})` : `Local Blockchain (${expectedChainId ?? 1337})`}
         </span>
 
-        <button type="button" className="icon-btn" aria-label="Notifications">
-          <BellIcon width={17} height={17} />
-        </button>
+        {hasMetaMask && account && (
+          <div className="app-header-wallet">
+            <span className="app-header-wallet-role">
+              {participantLoading ? "Loading..." : isRegisteredAndActive ? ROLE_NAMES[role] : "Not registered"}
+            </span>
+            <span className="app-header-wallet-address">
+              {account.slice(0, 6)}&hellip;{account.slice(-4)}
+            </span>
+          </div>
+        )}
 
         <button type="button" className="btn btn-secondary" onClick={handleLogout}>
           Log out
         </button>
-
-        {hasMetaMask && account && (
-          <div className="topbar-wallet">
-            <span className="topbar-wallet-avatar" aria-hidden="true" />
-            <div className="topbar-wallet-text">
-              <span className="topbar-wallet-role">
-                {participantLoading ? "Loading..." : isRegisteredAndActive ? ROLE_NAMES[role] : "Not registered"}
-              </span>
-              <span className="topbar-wallet-address">
-                {account.slice(0, 6)}&hellip;{account.slice(-4)}
-              </span>
-            </div>
-          </div>
-        )}
       </div>
     </header>
   );
