@@ -710,6 +710,7 @@ Received:      |█| ▄ ▂           |█| ▄ ▂    ◄ multipath echoes
 **Types listed by the lecturer** [WC-S 43]: fast, slow, flat, selective, Rayleigh, Rician. The slide marks this as **"H/W: study the different types of fading"** [WC-S 42].
 
 ### Large-scale vs small-scale fading [WC-B 5.3]
+
 | | **Large-scale fading** | **Small-scale fading** |
 |---|---|---|
 | Distance scale | Distances **well beyond a wavelength** (passing buildings, vacant lots, intersections) | About **half a wavelength** (at 900 MHz, λ = 0.33 m) |
@@ -956,6 +957,7 @@ All the correction mechanisms try to increase efficiency in **bps/Hz**, but **Sh
 5. **Adaptive modulation and coding**: send as many bits as possible for the current channel [WC-S 51].
 
 ## 3.10 Examination focus — Topic 3
+
 | Question | Source |
 |---|---|
 | What distinguishes SU-MIMO from MU-MIMO? (8) | T1B Q9; [WC-S 72] |
@@ -1199,6 +1201,7 @@ In BPSK, draw a **phase reversal** (the wave flips upside down) at each 0↔1 bo
 **Part 2** covers Topic 5 (multiple access: FDMA, TDMA, CDMA, SDMA, cellular generations), Topic 6 (spread spectrum: FHSS, DSSS, why CDMA is hard to jam), Topic 7 (OFDM, OFDMA, SC-FDMA) and Topic 8 (error detection and correction: parity, checksum, Hamming and CRC, all worked step by step, including the exact past-paper numbers).
 
 ### Errors found in your notes (Part 1 topics)
+
 | Location | Error | Correct |
 |---|---|---|
 | *Wireless Communication Problems*, Problem 2.7 (p. 62) | "125 × 10⁻³ = (4 × 3.14 × d/0.3529)²" | Path loss = **125 × 10³**; final answer 9.93 m is correct |

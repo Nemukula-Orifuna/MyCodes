@@ -46,6 +46,7 @@ WLANs are a fast-growing market that brings the flexibility of wireless access i
 ## 9.3 WLAN characteristics, design goals, wired vs wireless
 
 ### Advantages and disadvantages [WL 3]
+
 | Advantages | Disadvantages |
 |---|---|
 | **Very flexible** within radio coverage | **Low bandwidth** compared to wired (~11–54 Mbit/s in the slide), because of radio limits, **higher error rates** from interference, and **higher delay/delay variation** from extensive error correction and detection |
@@ -421,6 +422,7 @@ Only **8 can be active** (1 master + 7 active slaves): the active-member address
 **MAC protocol in the baseband (BTX 17)**: **TDMA with master polling (FH-TDD-TDMA)**. Slaves send only in the slot after the master addresses them. **No contention within a piconet.**
 
 ## 10.9 ★ User logical links [BT-B, BT-S 31–35]
+
 | Link | Description |
 |---|---|
 | **SCO** (synchronous connection-oriented) | **Fixed bandwidth**, point-to-point, master ↔ **one** slave. **Reserved slots at regular intervals**; the unit is **two consecutive slots** (one each way), so it is **symmetric**. A master supports **up to 3 SCO links**; a slave supports 3 to one master or 2 to different masters. **SCO packets are never retransmitted.** |
@@ -625,6 +627,7 @@ Loop (until N' = all nodes):
 | t | y 7, v 4, u 2 |
 
 ### ★ Worked example DJ1: shortest paths from x (T2-2025 Q2, 8 marks)
+
 | Step | N' | D(t),p | D(u),p | D(v),p | D(w),p | D(y),p | D(z),p |
 |---|---|---|---|---|---|---|---|
 | 0 | x | ∞ | ∞ | **3,x** | 6,x | 6,x | 8,x |
@@ -655,6 +658,7 @@ Loop (until N' = all nodes):
 | z | 8 | x → z | z |
 
 ### ★ Worked example DJ2: shortest paths from t (Exam Q3(c)(i), 4 marks)
+
 | Step | N' | D(u),p | D(v),p | D(w),p | D(x),p | D(y),p | D(z),p |
 |---|---|---|---|---|---|---|---|
 | 0 | t | **2,t** | 4,t | ∞ | ∞ | 7,t | ∞ |
@@ -677,6 +681,7 @@ Loop (until N' = all nodes):
 | z | 15 | t → v → x → z |
 
 ### ★ Worked example DJ3: shortest paths from w (Exam Q3(c)(ii), 4 marks)
+
 | Step | N' | D(t),p | D(u),p | D(v),p | D(x),p | D(y),p | D(z),p |
 |---|---|---|---|---|---|---|---|
 | 0 | w | ∞ | **3,w** | 4,w | 6,w | ∞ | ∞ |
@@ -758,6 +763,7 @@ dₓ(y) = min over all neighbours v of { c(x,v) + dᵥ(y) }
 It is **iterative** (until no more changes), **asynchronous** (no lock-step) and **distributed** (each node uses only neighbour information).
 
 ### ★ Link-state vs distance-vector (Exam Q3(a), 4 marks)
+
 | | **Link-state (LS)** | **Distance-vector (DV)** |
 |---|---|---|
 | **Knowledge** | **Global**: every router has the **complete topology** | **Local**: only neighbours' cost estimates ("routing by rumour") |

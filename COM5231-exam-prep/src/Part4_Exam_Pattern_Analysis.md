@@ -9,6 +9,7 @@ This part analyses **all five past assessments** (450 marks in total). Every sta
 ## 4.1 Question-by-question extraction
 
 ### Exam paper (green; title/year not visible; pages 2–4; 100 marks)
+
 | Q | Question (abridged) | Marks | Topic | Type |
 |---|---|---|---|---|
 | 1(a) | Differences between path loss, multipath propagation, interference | 6 | T2 | Comparison |
@@ -37,6 +38,7 @@ This part analyses **all five past assessments** (450 marks in total). Every sta
 | 5(e)(ii) | Channels 1 and 11 | 4 | T9 | Scenario |
 
 ### Test 1, version A (T1A; 100 marks)
+
 | Q | Question | Marks | Topic | Type |
 |---|---|---|---|---|
 | 1 | Three basic propagation mechanisms in a mobile system | 12 | T2 | Explanation |
@@ -56,6 +58,7 @@ This part analyses **all five past assessments** (450 marks in total). Every sta
 | 14 | 850 MHz, 125 mW, received 1 µW: distance? | 6 | T2 | **Calculation** |
 
 ### COM5231 Test 1, version B (T1B; 100 marks)
+
 | Q | Question | Marks | Topic | Type |
 |---|---|---|---|---|
 | 1 | Single-bit vs burst errors; extent parity is appropriate | 10 | T8 | Explanation |
@@ -70,6 +73,7 @@ This part analyses **all five past assessments** (450 marks in total). Every sta
 | 9 | SU-MIMO vs MU-MIMO | 8 | T3 | Comparison |
 
 ### Test 2 2025 (T2-2025; 100 marks)
+
 | Q | Question | Marks | Topic | Type |
 |---|---|---|---|---|
 | 1 | Three categories of MANET routing protocols | 12 | T11 | Explanation |
@@ -85,6 +89,7 @@ This part analyses **all five past assessments** (450 marks in total). Every sta
 | 10(ii) | Channels 1 and 11 | 10 | T9 | Scenario |
 
 ### COM5231 Test 2 2026 (T2-2026; 50 marks)
+
 | Q | Question | Marks | Topic | Type |
 |---|---|---|---|---|
 | 1 | Routing vs packet forwarding vs switching: purpose and decision information | 6 | T11 | Comparison |

@@ -65,6 +65,7 @@ Use this as your **last-week and night-before** document. Every item points back
 ## C. Formulas and procedures
 
 ### C1. Formula sheet
+
 | Formula | Use when |
 |---|---|
 | **T = 1/f; λ = c/f** (c = 3 × 10⁸ m/s) | Period, wavelength |

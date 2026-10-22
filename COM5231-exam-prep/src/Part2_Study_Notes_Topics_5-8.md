@@ -335,6 +335,7 @@ SUPPLEMENTARY: this resistance is measured by the **processing gain** Gp = Bss/B
 **5G**: **2020–2030**; capacity **1 Gbps – "unlimited"**; high speed and capacity; faster than 4G; supports interactive multimedia, voice streaming; more efficient; frequency **3–300 GHz**; **1000× bandwidth per unit area**; technology **WWWW** (World Wide Wireless Web).
 
 ### Comparison table [MA p16]
+
 | | **1G** | **2G** | **3G** | **4G** | **5G** |
 |---|---|---|---|---|---|
 | Deployment | 1970–80 | 1990–2004 | 2004–10 | Now | Soon (≈2020) |

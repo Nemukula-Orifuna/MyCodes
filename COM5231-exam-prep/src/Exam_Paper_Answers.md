@@ -143,6 +143,7 @@ One's-complement addition with end-around carry:
 Notation: D(n),p(n) = current least cost and predecessor; "—" = already in N'.
 
 #### (i) Shortest paths from t (4)
+
 | Step | N' | D(u),p | D(v),p | D(w),p | D(x),p | D(y),p | D(z),p |
 |---|---|---|---|---|---|---|---|
 | 0 | t | **2,t** | 4,t | ∞ | ∞ | 7,t | ∞ |
@@ -161,6 +162,7 @@ Updates: via u: w = 2 + 3 = 5. Via v: x = 4 + 3 = 7 (y via v = 12 > 7; w via v =
 | Path | t-u | t-v | t-u-w | t-v-x | t-y | t-v-x-z |
 
 #### (ii) Shortest paths from w (4)
+
 | Step | N' | D(t),p | D(u),p | D(v),p | D(x),p | D(y),p | D(z),p |
 |---|---|---|---|---|---|---|---|
 | 0 | w | ∞ | **3,w** | 4,w | 6,w | ∞ | ∞ |

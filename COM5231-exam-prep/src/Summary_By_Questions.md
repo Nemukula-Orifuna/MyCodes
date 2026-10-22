@@ -335,6 +335,7 @@ This is the **whole module condensed into questions and answers**. Every past-pa
 - Collisions **between piconets** (the same hop in the same slot) are an FH-CDMA effect handled by FEC and ARQ, not a hidden-terminal problem.
 
 ## ★ Bluetooth exercises (quick answers)
+
 | # | Question | Answer |
 |---|---|---|
 | 1 | Why a WPAN, not a WLAN? | ~10 m personal range, low power and cost, cable replacement, ≤ 8 active devices |

@@ -143,6 +143,7 @@ These are needed because Shannon limits the bps/Hz achievable for a given SNR [W
 - **Hybrid**: **ZRP**: each node has a **zone** (radius in hops). Intra-zone routing is proactive (IARP); inter-zone routing is reactive (IERP), querying only **border nodes** ("bordercasting"). Combines low latency nearby with low overhead far away.
 
 ### Q2. Dijkstra on Figure 1 from x to all nodes. (8)
+
 | Step | N' | D(t),p | D(u),p | D(v),p | D(w),p | D(y),p | D(z),p |
 |---|---|---|---|---|---|---|---|
 | 0 | x | ∞ | ∞ | **3,x** | 6,x | 6,x | 8,x |
@@ -256,6 +257,7 @@ Inequality: **2^r ≥ m + r + 1**, with m = 8 data bits.
 **Minimum r = 4** check bits, giving a 12-bit codeword.
 
 #### (b) Data-bit placement and value of each check bit, with the positions covered. (4)
+
 | Position | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|
 | Bit | P1 | P2 | **1** | P4 | **1** | **0** | **0** | P8 | **1** | **0** | **1** | **0** |
@@ -275,6 +277,7 @@ Inequality: **2^r ≥ m + r + 1**, with m = 8 data bits.
 Degree 3 → **append 3 zeros** → **110101000**.
 
 #### (b) Show the division and the CRC remainder. (3)
+
 | Step | Window | ⊕ 1011 | Result | Working value |
 |---|---|---|---|---|
 | 1 | 1101 | 1011 | 0110 | 011001000 |
@@ -308,6 +311,7 @@ Degree 3 → **append 3 zeros** → **110101000**.
 
 ### Q4. Simplified Internet checksum, 4-bit words. Message 1010 1100 0110 1001; one's-complement addition with end-around carry.
 #### (a) Show the addition and calculate the checksum. (3)
+
 | Step | Addition | Raw result | End-around carry | Running sum |
 |---|---|---|---|---|
 | 1 | 1010 + 1100 | 1 0110 | 0110 + 1 | **0111** |
@@ -347,6 +351,7 @@ Degree 3 → **append 3 zeros** → **110101000**.
 **Link costs read from the figure**: A–B 2, A–G 6, B–C 7, B–E 2, E–G 1, E–F 2, F–C 3, F–H 2, G–H 4, C–D 3, H–D 2.
 
 #### (a) Shortest path from A to all nodes (step by step). (6)
+
 | Step | N' | B | C | D | E | F | G | H |
 |---|---|---|---|---|---|---|---|---|
 | 0 | A | **2,A** | ∞ | ∞ | ∞ | ∞ | 6,A | ∞ |
@@ -368,6 +373,7 @@ Working:
 - Step 6: via C (9): D = 9 + 3 = 12 > 10 (no change). Smallest = **D (10)**. Done.
 
 #### (b) Final shortest-path cost and complete route from A to B, C, D, E and F. (4)
+
 | Destination | Cost | Route |
 |---|---|---|
 | B | **2** | A → B |
